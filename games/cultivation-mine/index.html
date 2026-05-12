@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>挖矿仙人 - 探宝扫雷</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #0a0a12; overflow: hidden; font-family: "Microsoft YaHei", sans-serif; user-select: none; }
+#game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#ui-overlay { position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 8px 16px; display: flex; justify-content: space-between; background: linear-gradient(to bottom, rgba(5,5,15,0.85) 0%, transparent 100%); pointer-events: none; }
+#ui-left, #ui-right { display: flex; align-items: center; gap: 16px; }
+#realm-name { font-size: 22px; font-weight: bold; color: #fff; text-shadow: 0 0 10px currentColor; }
+#score-display { color: #ffd700; font-size: 18px; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+#mine-display, #depth-display, #target-display { color: #ccc; font-size: 14px; }
+canvas { display: block; border-radius: 4px; }
+#overlay-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5,5,15,0.92); }
+#overlay-screen.hidden { opacity: 0; pointer-events: none; }
+#overlay-title { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #ffd700, 0 0 40px #a0522d; margin-bottom: 8px; }
+#overlay-subtitle { font-size: 18px; color: #aaa; margin-bottom: 24px; }
+#overlay-info { color: #ccc; font-size: 15px; line-height: 1.8; text-align: center; margin-bottom: 24px; white-space: pre-line; }
+.btn { padding: 12px 36px; font-size: 18px; font-weight: bold; color: #fff; background: linear-gradient(135deg, #a0522d, #cd853f); border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(160,82,45,0.4); transition: transform 0.15s; margin: 6px; }
+.btn:hover { transform: translateY(-2px); }
+#controls-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-size: 12px; z-index: 10; text-align: center; }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="ui-overlay">
+    <div id="ui-left">
+      <span id="realm-name">炼气期</span>
+      <span id="depth-display">深度: 1</span>
+      <span id="target-display">目标: 100</span>
+    </div>
+    <div id="ui-right">
+      <span id="mine-display">💥 踩雷: 0/3</span>
+      <span id="score-display">得分: 0</span>
+    </div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div id="controls-hint">点击方块: 挖矿 | 右键标记: 🚩 可疑 | 长按: 连续挖掘</div>
+  <div id="overlay-screen">
+    <div id="overlay-title">⛏️ 挖矿仙人</div>
+    <div id="overlay-subtitle">探宝扫雷，挖出修仙资源</div>
+    <div id="overlay-info">🖱️ 点击方块挖矿
+🏆 达到目标分数进入下一层
+💥 踩到3颗地雷游戏结束
+🚩 右键标记可疑地雷
+数字表示周围地雷数量</div>
+    <button class="btn" id="btn-start">开始挖矿</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

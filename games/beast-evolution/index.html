@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>仙兽进化</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    font-family: 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #e0d5c0;
+    overflow: hidden;
+  }
+  .game-container { position: relative; width: 480px; max-width: 100vw; }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #1a2a2a, #2a1a2a);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #3a5a5a;
+    border-bottom: none;
+  }
+  .header h1 {
+    font-size: 20px;
+    background: linear-gradient(135deg, #44ddcc, #44aacc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stats { display: flex; gap: 16px; font-size: 14px; }
+  .stats span { display: flex; align-items: center; gap: 4px; }
+  .xp-bar {
+    width: 100%; height: 6px;
+    background: #1a1a2a; border-radius: 3px; overflow: hidden;
+  }
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #44ddcc, #44ffaa);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  canvas {
+    display: block;
+    background: linear-gradient(180deg, #0a1a2a, #0a2a1a);
+    border-left: 1px solid #3a5a5a;
+    border-right: 1px solid #3a5a5a;
+    border-bottom: 1px solid #3a5a5a;
+    border-radius: 0 0 12px 12px;
+    cursor: none;
+  }
+  .footer {
+    display: flex; justify-content: space-between;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #1a2a2a, #2a1a2a);
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #3a5a5a;
+    border-top: none;
+  }
+  .level-badge {
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #44ddcc, #22aa99);
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+  }
+  .btn {
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #44ddcc, #22aa99);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(10, 10, 26, 0.95);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100; border-radius: 12px;
+  }
+  .overlay h2 {
+    font-size: 32px; margin-bottom: 16px;
+    background: linear-gradient(135deg, #44ddcc, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .overlay p { font-size: 14px; margin: 6px 0; color: #a09580; }
+  .overlay .final-score { font-size: 48px; color: #44ddcc; margin: 16px 0; }
+  .instructions { max-width: 280px; text-align: center; line-height: 1.6; color: #8a7a6a; }
+  .evo-btn {
+    padding: 10px 32px;
+    background: linear-gradient(135deg, #44ddcc, #22aa99);
+    border: none; border-radius: 8px;
+    color: white; font-size: 18px;
+    cursor: pointer; margin-top: 16px;
+  }
+  .evo-btn:hover { transform: scale(1.05); }
+  @media (pointer: coarse) {
+    .game-container { width: 100vw; max-width: 480px; }
+    canvas { width: 100% !important; height: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="header">
+    <h1>🐉 仙兽进化</h1>
+    <div class="stats">
+      <span>🏆 <span id="score">0</span></span>
+      <span>❤️ <span id="hp">3</span></span>
+    </div>
+  </div>
+  <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+  <canvas id="gameCanvas" width="480" height="400"></canvas>
+  <div class="footer">
+    <div class="level-badge" id="levelBadge">灵兽幼崽</div>
+    <button class="btn" id="restartBtn">重新开始</button>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h2>🐉 仙兽进化</h2>
+    <div class="instructions">
+      <p>🖱️ 鼠标/触屏控制仙兽移动</p>
+      <p>吃比自己小的灵兽 → 获得修为</p>
+      <p>躲避比自己大的灵兽 → 否则扣血</p>
+      <p style="margin-top:12px;">积累足够修为即可进化！</p>
+    </div>
+    <button class="evo-btn" onclick="startGame()">开始修炼</button>
+  </div>
+
+  <div class="overlay" id="endOverlay" style="display:none;">
+    <h2>仙兽陨落！</h2>
+    <p>获得修为</p>
+    <div class="final-score" id="finalScore">0</div>
+    <p id="finalLevel">最终形态：灵兽幼崽</p>
+    <button class="evo-btn" onclick="startGame()">再次修炼</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

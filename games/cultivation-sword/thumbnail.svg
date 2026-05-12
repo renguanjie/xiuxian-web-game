@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#1a0a1a"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="slash"><feGaussianBlur stdDeviation="1"/></filter>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)" rx="12"/>
+  <!-- Grid of enemies -->
+  <g filter="url(#glow)">
+    <!-- Row 1 -->
+    <circle cx="60" cy="40" r="16" fill="#ef4444" opacity="0.8"/><text x="60" y="45" text-anchor="middle" font-size="16">🔥</text>
+    <circle cx="110" cy="40" r="16" fill="#ef4444" opacity="0.8"/><text x="110" y="45" text-anchor="middle" font-size="16">🔥</text>
+    <circle cx="160" cy="40" r="16" fill="#4a9eff" opacity="0.8"/><text x="160" y="45" text-anchor="middle" font-size="16">💧</text>
+    <circle cx="210" cy="40" r="16" fill="#4a9eff" opacity="0.8"/><text x="210" y="45" text-anchor="middle" font-size="16">💧</text>
+    <circle cx="260" cy="40" r="16" fill="#4a9eff" opacity="0.8"/><text x="260" y="45" text-anchor="middle" font-size="16">💧</text>
+    <!-- Row 2 -->
+    <circle cx="60" cy="80" r="16" fill="#ef4444" opacity="0.8"/><text x="60" y="85" text-anchor="middle" font-size="16">🔥</text>
+    <circle cx="110" cy="80" r="16" fill="#ef4444" opacity="0.8"/><text x="110" y="85" text-anchor="middle" font-size="16">🔥</text>
+    <circle cx="160" cy="80" r="16" fill="#4ade80" opacity="0.8"/><text x="160" y="85" text-anchor="middle" font-size="16">🌿</text>
+    <circle cx="210" cy="80" r="16" fill="#4ade80" opacity="0.8"/><text x="210" y="85" text-anchor="middle" font-size="16">🌿</text>
+    <circle cx="260" cy="80" r="16" fill="#4a9eff" opacity="0.8"/><text x="260" y="85" text-anchor="middle" font-size="16">💧</text>
+    <!-- Row 3 -->
+    <circle cx="85" cy="120" r="16" fill="#ffd700" opacity="0.8"/><text x="85" y="125" text-anchor="middle" font-size="16">⚡</text>
+    <circle cx="135" cy="120" r="16" fill="#a0522d" opacity="0.8"/><text x="135" y="125" text-anchor="middle" font-size="16">🪨</text>
+    <circle cx="185" cy="120" r="16" fill="#ffd700" opacity="0.8"/><text x="185" y="125" text-anchor="middle" font-size="16">⚡</text>
+    <circle cx="235" cy="120" r="16" fill="#a0522d" opacity="0.8"/><text x="235" y="125" text-anchor="middle" font-size="16">🪨</text>
+  </g>
+  <!-- Sword slash line connecting fire enemies -->
+  <path d="M 60,40 L 110,40 L 60,80 L 110,80" stroke="#fff" stroke-width="3" fill="none" filter="url(#slash)"/>
+  <line x1="60" y1="40" x2="110" y2="40" stroke="#4a9eff" stroke-width="2" stroke-dasharray="4,3"/>
+  <line x1="110" y1="40" x2="60" y2="80" stroke="#4a9eff" stroke-width="2" stroke-dasharray="4,3"/>
+  <line x1="60" y1="80" x2="110" y2="80" stroke="#4a9eff" stroke-width="2" stroke-dasharray="4,3"/>
+  <!-- Connection dots -->
+  <circle cx="60" cy="40" r="4" fill="#fff"/><circle cx="110" cy="40" r="4" fill="#fff"/>
+  <circle cx="60" cy="80" r="4" fill="#fff"/><circle cx="110" cy="80" r="4" fill="#fff"/>
+  <!-- Chain count -->
+  <rect x="78" y="50" width="24" height="20" fill="rgba(0,0,0,0.7)" rx="4"/>
+  <text x="90" y="65" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#fff">4</text>
+  <!-- HUD -->
+  <text x="160" y="155" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#ffd700">🔥 连击: 3</text>
+  <text x="80" y="155" font-family="sans-serif" font-size="10" fill="#ccc">金丹期</text>
+  <text x="240" y="155" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#ccc">得分: 2840</text>
+  <!-- Title -->
+  <text x="160" y="178" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#ffd700">⚔️ 仙剑索敌</text>
+</svg>

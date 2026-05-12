@@ -1,0 +1,32 @@
+/* 修仙暗色主题 - CSS 变量 */
+:root {
+  /* 背景层次 */
+  --bg-primary: #0a0a12;
+  --bg-secondary: #12121f;
+  --bg-tertiary: #1a1a2e;
+  --bg-elevated: #252540;
+  --bg-overlay: rgba(10, 10, 18, 0.85);
+
+  /* 文字 */
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --text-link: #7c5cfc;
+
+  /* 光晕 */
+  --glow-primary: 0 0 20px rgba(124, 92, 252, 0.3);
+  --glow-accent: 0 0 20px rgba(6, 214, 160, 0.3);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #7c5cfc 0%, #06d6a0 100%);
+  --gradient-hero: linear-gradient(180deg, rgba(10, 10, 18, 0) 0%, rgba(10, 10, 18, 0.95) 100%);
+  --gradient-card: linear-gradient(145deg, rgba(124, 92, 252, 0.1) 0%, rgba(6, 214, 160, 0.05) 100%);
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}

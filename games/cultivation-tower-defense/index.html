@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>修仙塔防</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  overflow: hidden;
+  color: #e0d8c8;
+}
+#gameContainer {
+  position: relative;
+  border: 2px solid #3a2a1a;
+  box-shadow: 0 0 30px rgba(100, 60, 20, 0.3), inset 0 0 30px rgba(0,0,0,0.5);
+  border-radius: 4px;
+  width: 900px;
+  height: 600px;
+}
+canvas { display: block; cursor: crosshair; width: 900px; height: 600px; }
+#uiOverlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+}
+/* ========== 顶部状态栏 ========== */
+#topBar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: linear-gradient(180deg, rgba(10,5,0,0.95) 0%, rgba(10,5,0,0.7) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+  pointer-events: auto;
+  border-bottom: 1px solid #3a2a1a;
+  z-index: 10;
+}
+.topItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(255,200,100,0.3);
+  white-space: nowrap;
+}
+.topItem .icon { font-size: 16px; }
+.speedBtn {
+  background: rgba(40,25,15,0.6);
+  border: 1px solid #5a4a3a;
+  border-radius: 4px;
+  color: #e0d8c8;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 3px 8px;
+  transition: all 0.15s;
+}
+.speedBtn:hover { background: rgba(60,40,25,0.8); border-color: #8a7a5a; }
+.hpBarOuter {
+  width: 100px; height: 14px;
+  background: #1a0a0a;
+  border: 1px solid #5a3a2a;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.hpBarInner {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4444, #ff8844);
+  transition: width 0.3s;
+  border-radius: 7px;
+}
+/* ========== 底部塔选择栏 ========== */
+#bottomBar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: linear-gradient(0deg, rgba(10,5,0,0.95) 0%, rgba(10,5,0,0.7) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 10px;
+  pointer-events: auto;
+  border-top: 1px solid #3a2a1a;
+  z-index: 10;
+}
+.towerBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 85px;
+  height: 58px;
+  background: rgba(40,25,15,0.8);
+  border: 2px solid #5a4a3a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #e0d8c8;
+  font-size: 11px;
+}
+.towerBtn:hover { background: rgba(60,40,25,0.9); border-color: #8a7a5a; }
+.towerBtn.selected { border-color: #ffcc44; box-shadow: 0 0 12px rgba(255,200,50,0.4); background: rgba(60,40,25,0.95); }
+.towerBtn .tIcon { font-size: 20px; line-height: 1; }
+.towerBtn .tName { font-size: 11px; margin-top: 1px; }
+.towerBtn .tCost { font-size: 10px; color: #88ccff; }
+.towerBtn.disabled { opacity: 0.4; cursor: not-allowed; }
+/* ========== 升级面板 ========== */
+#upgradePanel {
+  position: absolute;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15,10,5,0.95);
+  border: 2px solid #5a4a3a;
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  pointer-events: auto;
+  z-index: 10;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+#upgradePanel .info { font-size: 13px; text-align: center; }
+#upgradePanel .info .stars { color: #ffcc44; }
+.upgBtn {
+  padding: 6px 16px;
+  border: 1px solid #5a4a3a;
+  border-radius: 6px;
+  background: rgba(40,25,15,0.8);
+  color: #e0d8c8;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+.upgBtn:hover { background: rgba(60,40,25,0.9); border-color: #8a7a5a; }
+.sellBtn { border-color: #aa4444; color: #ff8888; }
+.sellBtn:hover { background: rgba(80,20,20,0.8); border-color: #cc6666; }
+/* ========== Boss 警告 ========== */
+#bossWarn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: bold;
+  color: #ff4444;
+  text-shadow: 0 0 30px rgba(255,50,50,0.8);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.3s;
+}
+/* ========== 倒计时 ========== */
+#countdown {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 15px;
+  color: #88ccff;
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: 0 0 8px rgba(100,180,255,0.5);
+  opacity: 0;
+}
+/* ========== 主菜单 ========== */
+.screen-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,2,0,0.92);
+  pointer-events: auto;
+  z-index: 20;
+}
+.screen-overlay h1 {
+  font-size: 48px;
+  color: #ffcc44;
+  text-shadow: 0 0 30px rgba(255,200,50,0.5);
+  margin-bottom: 8px;
+}
+.screen-overlay .subtitle {
+  font-size: 18px;
+  color: #a09880;
+  margin-bottom: 30px;
+}
+.bigBtn {
+  padding: 14px 50px;
+  font-size: 20px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #3a2a1a, #5a3a2a);
+  border: 2px solid #8a7a5a;
+  border-radius: 10px;
+  color: #ffcc44;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: 0 0 10px rgba(255,200,50,0.3);
+  margin: 6px;
+}
+.bigBtn:hover {
+  background: linear-gradient(135deg, #4a3a2a, #6a4a3a);
+  box-shadow: 0 0 20px rgba(255,200,50,0.3);
+  transform: scale(1.05);
+}
+/* ========== 模式选择按钮组 ========== */
+.modeBtns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+/* ========== 关卡选择网格 ========== */
+#levelSelectGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: 15px auto;
+  padding: 0 10px;
+}
+.levelCard {
+  width: 105px;
+  height: 90px;
+  background: rgba(30,20,10,0.9);
+  border: 2px solid #5a4a3a;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.levelCard:hover:not(.locked) {
+  border-color: #ffcc44;
+  box-shadow: 0 0 12px rgba(255,200,50,0.3);
+  transform: scale(1.05);
+}
+.levelCard.locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+.levelCard.completed {
+  border-color: #44aa44;
+}
+.levelCard .lvlNum { font-size: 22px; font-weight: bold; color: #ffcc44; }
+.levelCard .lvlInfo { font-size: 10px; color: #a09880; margin-top: 2px; text-align: center; }
+.levelCard .lvlBadge { position: absolute; top: 4px; right: 6px; font-size: 14px; }
+.levelCard .lvlReward { font-size: 10px; color: #88ccff; margin-top: 1px; }
+/* ========== 结算弹窗 ========== */
+#resultScreen .result-stats {
+  background: rgba(30,20,10,0.8);
+  border: 1px solid #5a4a3a;
+  border-radius: 8px;
+  padding: 15px 30px;
+  margin: 15px 0;
+  text-align: center;
+}
+#resultScreen .result-stats div { margin: 6px 0; font-size: 16px; }
+#resultScreen .result-stats .highlight { color: #ffcc44; font-size: 20px; font-weight: bold; }
+#resultScreen .mode-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  background: rgba(255,200,50,0.15);
+  border: 1px solid #8a7a5a;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #ffcc44;
+  margin-bottom: 8px;
+}
+/* ========== 返回按钮 ========== */
+.backBtn {
+  padding: 8px 24px;
+  font-size: 14px;
+  background: rgba(30,20,10,0.8);
+  border: 1px solid #5a4a3a;
+  border-radius: 6px;
+  color: #a09880;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+.backBtn:hover { border-color: #8a7a5a; color: #e0d8c8; }
+/* ========== 无尽模式最高分 ========== */
+.endless-best {
+  font-size: 14px;
+  color: #ffcc44;
+  margin-bottom: 10px;
+}
+/* ========== 移动端适配 ========== */
+@media (pointer: coarse) {
+  #gameContainer {
+    width: 100vw;
+    height: calc(100vw * 600 / 900);
+    border: none;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+  .towerBtn {
+    width: 72px;
+    height: 52px;
+  }
+  .towerBtn .tIcon { font-size: 18px; }
+  .towerBtn .tName { font-size: 10px; }
+  .towerBtn .tCost { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div id="gameContainer">
+  <canvas id="gameCanvas"></canvas>
+  <div id="uiOverlay">
+    <!-- 顶部状态栏 -->
+    <div id="topBar">
+      <div class="topItem"><span class="icon" id="modeIcon">🏯</span> <span id="modeDisplay">关卡模式</span></div>
+      <div class="topItem"><span class="icon">💎</span> 灵石: <span id="goldDisplay">100</span></div>
+      <div class="topItem"><span class="icon">🏯</span> 道场 HP:
+        <div class="hpBarOuter"><div class="hpBarInner" id="hpBar"></div></div>
+        <span id="hpText">20/20</span>
+      </div>
+      <div class="topItem"><span class="icon">🌊</span> <span id="waveLabel">波次:</span> <span id="waveDisplay">0</span>/<span id="waveTotal">20</span></div>
+      <div class="topItem">
+        <button id="pauseBtn" class="speedBtn" onclick="togglePause()">⏸</button>
+        <button id="speedBtn" class="speedBtn" onclick="cycleSpeed()">1x</button>
+      </div>
+    </div>
+    <!-- 底部塔选择栏 -->
+    <div id="bottomBar">
+      <button class="towerBtn" data-type="sword" onclick="selectTower('sword')">
+        <span class="tIcon">⚔️</span><span class="tName">剑塔</span><span class="tCost">💎 20</span>
+      </button>
+      <button class="towerBtn" data-type="thunder" onclick="selectTower('thunder')">
+        <span class="tIcon">⚡</span><span class="tName">雷塔</span><span class="tCost">💎 30</span>
+      </button>
+      <button class="towerBtn" data-type="fire" onclick="selectTower('fire')">
+        <span class="tIcon">🔥</span><span class="tName">火塔</span><span class="tCost">💎 25</span>
+      </button>
+      <button class="towerBtn" data-type="ice" onclick="selectTower('ice')">
+        <span class="tIcon">❄️</span><span class="tName">冰塔</span><span class="tCost">💎 20</span>
+      </button>
+    </div>
+    <!-- 升级面板 -->
+    <div id="upgradePanel">
+      <div class="info" id="upgInfo"></div>
+      <button class="upgBtn" id="upgBtn" onclick="upgradeTower()">升级</button>
+      <button class="upgBtn sellBtn" onclick="sellTower()">出售</button>
+      <button class="upgBtn" onclick="closeUpgrade()">关闭</button>
+    </div>
+    <!-- Boss 警告 -->
+    <div id="bossWarn">⚠️ BOSS 来袭! ⚠️</div>
+    <!-- 倒计时 -->
+    <div id="countdown"></div>
+
+    <!-- 主菜单 -->
+    <div id="mainMenu" class="screen-overlay">
+      <h1>修仙塔防</h1>
+      <p class="subtitle">守护道场，击退万妖</p>
+      <div class="modeBtns">
+        <button class="bigBtn" onclick="showLevelSelect()">📜 关卡模式</button>
+        <button class="bigBtn" onclick="startEndless()">♾️ 无尽模式</button>
+      </div>
+    </div>
+
+    <!-- 关卡选择 -->
+    <div id="levelSelect" class="screen-overlay" style="display:none">
+      <h1>选择关卡</h1>
+      <p class="subtitle">共 20 关，难度递增</p>
+      <div id="levelSelectGrid"></div>
+      <button class="backBtn" onclick="showMainMenu()">← 返回主菜单</button>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div id="resultScreen" class="screen-overlay" style="display:none">
+      <div class="mode-tag" id="resultMode"></div>
+      <h1 id="endTitle"></h1>
+      <p class="subtitle" id="endSubtitle"></p>
+      <div class="result-stats" id="resultStats"></div>
+      <div class="modeBtns">
+        <button class="bigBtn" id="resultRetry" onclick="retryGame()">再来一局</button>
+        <button class="bigBtn" onclick="showMainMenu()">返回菜单</button>
+      </div>
+      <div id="endlessBestDisplay"></div>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

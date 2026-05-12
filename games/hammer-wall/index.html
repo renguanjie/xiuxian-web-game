@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>锤墙仙人</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    font-family: 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #e0d5c0;
+    overflow: hidden;
+  }
+  .game-container {
+    position: relative;
+    width: 480px;
+    max-width: 100vw;
+    display: flex;
+    gap: 16px;
+  }
+  .board-wrap {
+    flex-shrink: 0;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #1a2a1a, #2a1a2a);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #3a5a3a;
+    border-bottom: none;
+  }
+  .header h1 {
+    font-size: 20px;
+    background: linear-gradient(135deg, #88cc44, #44aa22);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  canvas#gameBoard {
+    display: block;
+    background: #0a0a1a;
+    border-left: 1px solid #3a5a3a;
+    border-right: 1px solid #3a5a3a;
+    border-bottom: 1px solid #3a5a3a;
+    border-radius: 0 0 12px 12px;
+  }
+  .side-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .panel-box {
+    background: linear-gradient(135deg, #1a1a3a, #2a1a2a);
+    border: 1px solid #3a2a5a;
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .panel-box h3 {
+    font-size: 14px;
+    color: #8a7a6a;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffcc00;
+  }
+  canvas#nextPiece {
+    display: block;
+    margin: 0 auto;
+  }
+  .controls {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+  .ctrl-btn {
+    flex: 1;
+    min-width: 48px;
+    padding: 12px 8px;
+    background: linear-gradient(135deg, #3a2a5a, #2a1a4a);
+    border: 1px solid #4a3a6a;
+    border-radius: 10px;
+    color: #e0d5c0;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .ctrl-btn:hover { transform: scale(1.05); background: #4a3a6a; }
+  .ctrl-btn:active { transform: scale(0.95); }
+  .level-badge {
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #44aa22, #228800);
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 26, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    border-radius: 12px;
+  }
+  .overlay h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #88cc44, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .overlay p { font-size: 14px; margin: 6px 0; color: #a09580; }
+  .overlay .final-score { font-size: 48px; color: #ffcc00; margin: 16px 0; }
+  .instructions { max-width: 280px; text-align: center; line-height: 1.6; color: #8a7a6a; }
+  .btn {
+    padding: 10px 32px;
+    background: linear-gradient(135deg, #44aa22, #228800);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .btn:hover { transform: scale(1.05); }
+  @media (pointer: coarse) {
+    .game-container { width: 100vw; flex-direction: column; align-items: center; }
+    .board-wrap { width: 100%; max-width: 240px; }
+    canvas#gameBoard { width: 100% !important; height: auto !important; }
+    .side-panel { width: 100%; max-width: 240px; }
+    .ctrl-btn { padding: 14px 10px; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="board-wrap">
+    <div class="header">
+      <h1>🔨 锤墙仙人</h1>
+      <div class="level-badge" id="levelBadge">炼气期</div>
+    </div>
+    <canvas id="gameBoard" width="240" height="480"></canvas>
+  </div>
+
+  <div class="side-panel">
+    <div class="panel-box">
+      <h3>🏆 修为</h3>
+      <div class="stat-value" id="score">0</div>
+    </div>
+    <div class="panel-box">
+      <h3>📊 层数</h3>
+      <div class="stat-value" id="lines">0</div>
+    </div>
+    <div class="panel-box">
+      <h3>下一个灵阵</h3>
+      <canvas id="nextPiece" width="80" height="80"></canvas>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" id="btnLeft">⬅️</button>
+      <button class="ctrl-btn" id="btnRight">➡️</button>
+      <button class="ctrl-btn" id="btnDown">⬇️</button>
+      <button class="ctrl-btn" id="btnRotate">🔄</button>
+      <button class="ctrl-btn" id="btnDrop">⏬</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h2>🔨 锤墙仙人</h2>
+    <div class="instructions">
+      <p>⬅️➡️ 移动灵阵</p>
+      <p>🔄 旋转灵阵</p>
+      <p>⬇️ 加速下落</p>
+      <p>⏬ 直接落底</p>
+      <p style="margin-top:12px;">消除灵阵行获得修为<br>消除越多境界越高！</p>
+    </div>
+    <button class="btn" onclick="startGame()">开始修炼</button>
+  </div>
+
+  <div class="overlay" id="endOverlay" style="display:none;">
+    <h2>修炼结束！</h2>
+    <p>获得修为</p>
+    <div class="final-score" id="finalScore">0</div>
+    <p id="finalLevel">境界：炼气期</p>
+    <p id="finalLines">消除层数：0</p>
+    <button class="btn" onclick="startGame()">再次修炼</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

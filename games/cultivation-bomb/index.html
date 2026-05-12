@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>炸弹仙人 - 回合制爆破</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #0a0a12; overflow: hidden; font-family: "Microsoft YaHei", sans-serif; user-select: none; }
+#game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#ui-overlay { position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 8px 16px; display: flex; justify-content: space-between; background: linear-gradient(to bottom, rgba(5,5,15,0.85) 0%, transparent 100%); pointer-events: none; }
+#ui-left, #ui-right { display: flex; align-items: center; gap: 16px; }
+#realm-name { font-size: 22px; font-weight: bold; color: #fff; text-shadow: 0 0 10px currentColor; }
+#score-display { color: #ffd700; font-size: 18px; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+#level-display, #turn-display, #bomb-display, #lives-display { color: #ccc; font-size: 14px; }
+canvas { display: block; border-radius: 4px; }
+#overlay-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5,5,15,0.92); }
+#overlay-screen.hidden { opacity: 0; pointer-events: none; }
+#overlay-title { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #ff6b00, 0 0 40px #ff4400; margin-bottom: 8px; }
+#overlay-subtitle { font-size: 18px; color: #aaa; margin-bottom: 24px; }
+#overlay-info { color: #ccc; font-size: 15px; line-height: 1.8; text-align: center; margin-bottom: 24px; }
+.btn { padding: 12px 36px; font-size: 18px; font-weight: bold; color: #fff; background: linear-gradient(135deg, #ff6b00, #ff4400); border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,107,0,0.4); transition: transform 0.15s; margin: 6px; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,0,0.6); }
+.btn-secondary { background: linear-gradient(135deg, #374151, #4b5563); box-shadow: 0 4px 15px rgba(75,85,99,0.4); }
+#controls-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-size: 12px; z-index: 10; text-align: center; }
+#mobile-controls { position: absolute; bottom: 10px; left: 0; right: 0; z-index: 15; display: none; justify-content: space-between; padding: 0 15px; }
+.mobile-btn-group { display: flex; gap: 5px; align-items: flex-end; }
+.dpad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); gap: 2px; }
+.dpad-btn { width: 48px; height: 48px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: none; cursor: pointer; }
+.dpad-btn:active { background: rgba(255,255,255,0.3); }
+.dpad-center { visibility: hidden; }
+.fire-btn { width: 72px; height: 72px; border-radius: 50%; border: 2px solid rgba(255,107,0,0.5); background: rgba(255,107,0,0.3); color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: none; cursor: pointer; }
+.fire-btn:active { background: rgba(255,107,0,0.6); }
+@media (pointer: coarse) { #mobile-controls { display: flex; } #controls-hint { display: none; } }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="ui-overlay">
+    <div id="ui-left">
+      <span id="realm-name">炼气期</span>
+      <span id="bomb-display">💣 炸弹: 1</span>
+      <span id="level-display">关卡: 1</span>
+    </div>
+    <div id="ui-right">
+      <span id="turn-display">回合: 0</span>
+      <span id="lives-display">❤️ 3</span>
+      <span id="score-display">得分: 0</span>
+    </div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div id="controls-hint">↑↓←→/WASD: 移动 | 空格: 放置炸弹 | R: 重新开始</div>
+  <div id="mobile-controls">
+    <div class="mobile-btn-group">
+      <div class="dpad">
+        <div class="dpad-center"></div>
+        <div class="dpad-btn" id="btn-up">▲</div>
+        <div class="dpad-center"></div>
+        <div class="dpad-btn" id="btn-left">◀</div>
+        <div class="dpad-center"></div>
+        <div class="dpad-btn" id="btn-right">▶</div>
+        <div class="dpad-center"></div>
+        <div class="dpad-btn" id="btn-down">▼</div>
+        <div class="dpad-center"></div>
+      </div>
+    </div>
+    <div class="mobile-btn-group">
+      <div class="fire-btn" id="btn-fire">💣</div>
+    </div>
+  </div>
+  <div id="overlay-screen">
+    <div id="overlay-title">💣 炸弹仙人</div>
+    <div id="overlay-subtitle">回合制爆破，消灭所有敌人</div>
+    <div id="overlay-info"></div>
+    <button class="btn" id="btn-start">开始修炼</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

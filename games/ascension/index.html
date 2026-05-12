@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>飞升仙人</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    font-family: 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #e0d5c0;
+    overflow: hidden;
+  }
+  .game-container { position: relative; width: 480px; max-width: 100vw; }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #2a1a3a, #3a2a4a);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #5a4a7a;
+    border-bottom: none;
+  }
+  .header h1 {
+    font-size: 20px;
+    background: linear-gradient(135deg, #cc88ff, #aa66ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stats { display: flex; gap: 16px; font-size: 14px; }
+  .stats span { display: flex; align-items: center; gap: 4px; }
+  .height-bar {
+    width: 100%; height: 6px;
+    background: #1a1a2a; border-radius: 3px; overflow: hidden;
+  }
+  .height-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #cc88ff, #ff88cc);
+    border-radius: 3px; transition: width 0.2s;
+  }
+  canvas {
+    display: block;
+    background: linear-gradient(180deg, #1a1a3a, #0a0a2a);
+    border-left: 1px solid #5a4a7a;
+    border-right: 1px solid #5a4a7a;
+    border-bottom: 1px solid #5a4a7a;
+    border-radius: 0 0 12px 12px;
+  }
+  .footer {
+    display: flex; justify-content: space-between;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #2a1a3a, #3a2a4a);
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #5a4a7a;
+    border-top: none;
+  }
+  .realm-badge {
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #cc88ff, #aa66ff);
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+  }
+  .btn {
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #cc88ff, #aa66ff);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .btn:hover { transform: scale(1.05); }
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(10, 10, 26, 0.95);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100; border-radius: 12px;
+  }
+  .overlay h2 {
+    font-size: 32px; margin-bottom: 16px;
+    background: linear-gradient(135deg, #cc88ff, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .overlay p { font-size: 14px; margin: 6px 0; color: #a09580; }
+  .overlay .final-score { font-size: 48px; color: #cc88ff; margin: 16px 0; }
+  .instructions { max-width: 280px; text-align: center; line-height: 1.6; color: #8a7a6a; }
+  .fly-btn {
+    padding: 10px 32px;
+    background: linear-gradient(135deg, #cc88ff, #aa66ff);
+    border: none; border-radius: 8px;
+    color: white; font-size: 18px;
+    cursor: pointer; margin-top: 16px;
+  }
+  .fly-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="header">
+    <h1>☁️ 飞升仙人</h1>
+    <div class="stats">
+      <span>🏆 <span id="score">0</span></span>
+      <span>⬆️ <span id="height">0</span>m</span>
+    </div>
+  </div>
+  <div class="height-bar"><div class="height-fill" id="heightFill"></div></div>
+  <canvas id="gameCanvas" width="480" height="480"></canvas>
+  <div class="footer">
+    <div class="realm-badge" id="realmBadge">凡人</div>
+    <button class="btn" id="restartBtn">重新开始</button>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h2>☁️ 飞升仙人</h2>
+    <div class="instructions">
+      <p>⬅️➡️ 控制左右移动</p>
+      <p>在灵台上跳跃，不断向上攀登</p>
+      <p style="margin-top:12px;">跳得越高，修为越多</p>
+      <p>到达天庭即可飞升！</p>
+    </div>
+    <button class="fly-btn" onclick="startGame()">开始飞升</button>
+  </div>
+
+  <div class="overlay" id="endOverlay" style="display:none;">
+    <h2>飞升失败！</h2>
+    <p>获得修为</p>
+    <div class="final-score" id="finalScore">0</div>
+    <p id="finalRealm">最高境界：凡人</p>
+    <p id="finalHeight">攀登高度：0m</p>
+    <button class="fly-btn" onclick="startGame()">再次飞升</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

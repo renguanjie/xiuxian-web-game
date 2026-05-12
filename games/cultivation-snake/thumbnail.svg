@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1a0a"/>
+      <stop offset="100%" stop-color="#0a0a1a"/>
+    </linearGradient>
+    <linearGradient id="snake" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#4ade80"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)" rx="12"/>
+  <!-- Game area -->
+  <rect x="20" y="10" width="280" height="130" fill="#111" rx="4" stroke="#2a2a3a" stroke-width="1"/>
+  <!-- Grid -->
+  <g stroke="rgba(255,255,255,0.03)" stroke-width="0.5">
+    <line x1="40" y1="10" x2="40" y2="140"/><line x1="60" y1="10" x2="60" y2="140"/>
+    <line x1="80" y1="10" x2="80" y2="140"/><line x1="100" y1="10" x2="100" y2="140"/>
+    <line x1="120" y1="10" x2="120" y2="140"/><line x1="140" y1="10" x2="140" y2="140"/>
+    <line x1="160" y1="10" x2="160" y2="140"/><line x1="180" y1="10" x2="180" y2="140"/>
+    <line x1="200" y1="10" x2="200" y2="140"/><line x1="220" y1="10" x2="220" y2="140"/>
+    <line x1="240" y1="10" x2="240" y2="140"/><line x1="260" y1="10" x2="260" y2="140"/>
+    <line x1="280" y1="10" x2="280" y2="140"/>
+    <line x1="20" y1="30" x2="300" y2="30"/><line x1="20" y1="50" x2="300" y2="50"/>
+    <line x1="20" y1="70" x2="300" y2="70"/><line x1="20" y1="90" x2="300" y2="90"/>
+    <line x1="20" y1="110" x2="300" y2="110"/><line x1="20" y1="130" x2="300" y2="130"/>
+  </g>
+  <!-- Snake body -->
+  <g filter="url(#glow)">
+    <rect x="142" y="72" width="16" height="16" fill="#22c55e" rx="4"/>
+    <rect x="162" y="72" width="16" height="16" fill="#32d56e" rx="4"/>
+    <rect x="182" y="72" width="16" height="16" fill="#3dd578" rx="4"/>
+    <rect x="182" y="92" width="16" height="16" fill="#4ade80" rx="4"/>
+    <rect x="182" y="112" width="16" height="16" fill="#5ae090" rx="4"/>
+    <rect x="202" y="112" width="16" height="16" fill="#6ae89a" rx="4"/>
+    <rect x="222" y="112" width="16" height="16" fill="#7ae8a4" rx="4"/>
+    <rect x="222" y="92" width="16" height="16" fill="#88f0b0" rx="4"/>
+    <rect x="222" y="72" width="16" height="16" fill="#95f0b8" rx="4"/>
+    <rect x="242" y="72" width="16" height="16" fill="#a0f8c0" rx="4"/>
+    <rect x="242" y="52" width="16" height="16" fill="#a8f8c8" rx="4"/>
+    <rect x="242" y="32" width="16" height="16" fill="#b5f8d0" rx="4"/>
+    <rect x="222" y="32" width="16" height="16" fill="#c0f8d5" rx="4"/>
+    <rect x="202" y="32" width="16" height="16" fill="#c8f8dd" rx="4"/>
+  </g>
+  <!-- Snake head -->
+  <circle cx="190" cy="40" r="12" fill="#4ade80" filter="url(#glow)"/>
+  <text x="190" y="45" text-anchor="middle" font-size="14">🐍</text>
+  <!-- Fruits (food) -->
+  <text x="80" y="74" text-anchor="middle" font-size="14" filter="url(#glow)">🍎</text>
+  <text x="100" y="134" text-anchor="middle" font-size="14" filter="url(#glow)">🍊</text>
+  <text x="260" y="114" text-anchor="middle" font-size="14" filter="url(#glow)">🍑</text>
+  <text x="40" y="54" text-anchor="middle" font-size="14" filter="url(#glow)">✨</text>
+  <!-- HUD -->
+  <text x="30" y="158" font-family="sans-serif" font-size="10" fill="#4ade80">🐍 长度: 14</text>
+  <text x="160" y="158" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#ffd700">金丹期</text>
+  <text x="290" y="158" text-anchor="end" font-family="sans-serif" font-size="10" fill="#ccc">得分: 420</text>
+  <!-- Title -->
+  <text x="160" y="178" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#4ade80">🐍 修仙贪吃蛇</text>
+</svg>

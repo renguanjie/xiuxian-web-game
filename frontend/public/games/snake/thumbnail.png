@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#12121f"/>
+  <text x="320" y="170" text-anchor="middle" font-size="48">🐍</text>
+  <text x="320" y="220" text-anchor="middle" fill="#a0a0b8" font-size="20">修仙贪吃蛇</text>
+</svg>

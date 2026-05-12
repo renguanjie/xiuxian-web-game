@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+venv2/
+.env
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.git/
+.gitignore
+docker-compose*.yml
+Dockerfile
+.dockerignore

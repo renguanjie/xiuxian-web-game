@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>修仙贪吃蛇</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  background: #0a0a12;
+  overflow: hidden;
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  user-select: none;
+}
+#game-container {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#ui-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(5,5,15,0.85) 0%, transparent 100%);
+}
+#ui-left { display: flex; align-items: center; gap: 16px; }
+#realm-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 10px currentColor;
+}
+#progress-container {
+  width: 180px; height: 14px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 7px;
+  overflow: hidden;
+}
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 7px;
+  transition: width 0.3s;
+  background: linear-gradient(90deg, #4a9eff, #a855f7);
+  box-shadow: 0 0 8px rgba(74,158,255,0.5);
+}
+#length-display {
+  color: #ccc;
+  font-size: 14px;
+}
+#score-display {
+  color: #ffd700;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+#high-score {
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: right;
+}
+#canvas-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+canvas {
+  display: block;
+  border-radius: 4px;
+}
+#overlay-screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,5,15,0.92);
+  transition: opacity 0.3s;
+}
+#overlay-screen.hidden { opacity: 0; pointer-events: none; }
+#overlay-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 20px #a855f7, 0 0 40px #4a9eff;
+  margin-bottom: 8px;
+}
+#overlay-subtitle {
+  font-size: 18px;
+  color: #aaa;
+  margin-bottom: 24px;
+}
+#overlay-info {
+  color: #ccc;
+  font-size: 15px;
+  line-height: 1.8;
+  text-align: center;
+  margin-bottom: 24px;
+}
+#overlay-info .highlight { color: #ffd700; font-weight: bold; }
+#overlay-info .record { color: #ff6b6b; font-weight: bold; }
+.btn {
+  padding: 12px 36px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(168,85,247,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+  margin: 6px;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,85,247,0.6); }
+.btn:active { transform: translateY(0); }
+.btn-secondary {
+  background: linear-gradient(135deg, #374151, #4b5563);
+  box-shadow: 0 4px 15px rgba(75,85,99,0.4);
+}
+.btn-secondary:hover { box-shadow: 0 6px 20px rgba(75,85,99,0.6); }
+#leaderboard-panel {
+  margin-top: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px 20px;
+  max-width: 320px;
+  width: 100%;
+}
+#leaderboard-panel h3 {
+  color: #ffd700;
+  font-size: 16px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+#leaderboard-list {
+  list-style: none;
+  padding: 0;
+}
+#leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  color: #aaa;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+#leaderboard-list li:first-child { color: #ffd700; }
+#leaderboard-list li:nth-child(2) { color: #c0c0c0; }
+#leaderboard-list li:nth-child(3) { color: #cd7f32; }
+#controls-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.3);
+  font-size: 12px;
+  z-index: 10;
+  pointer-events: none;
+  text-align: center;
+}
+#mobile-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 15;
+  display: none;
+}
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 3px;
+}
+.dpad-btn {
+  width: 52px; height: 52px;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none; -webkit-user-select: none;
+  touch-action: none; cursor: pointer;
+}
+.dpad-btn:active { background: rgba(74,222,128,0.4); border-color: #4ade80; }
+.dpad-center { visibility: hidden; }
+@media (pointer: coarse) { #mobile-controls { display: block; } #controls-hint { display: none; } }
+#breakthrough-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+#breakthrough-overlay.active { opacity: 1; }
+#breakthrough-text {
+  font-size: 56px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 30px #ffd700, 0 0 60px #ff6b00, 0 0 90px #a855f7;
+  animation: breakthroughPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes breakthroughPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+#breakthrough-sub {
+  font-size: 22px;
+  color: #fff;
+  margin-top: 12px;
+  text-shadow: 0 0 10px #a855f7;
+}
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="ui-overlay">
+    <div id="ui-left">
+      <span id="realm-name">炼气期</span>
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <span id="length-display">灵脉: 3</span>
+    </div>
+    <div>
+      <div id="score-display">得分: 0</div>
+      <div id="high-score">最高: 0</div>
+    </div>
+  </div>
+
+  <div id="canvas-wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div id="breakthrough-overlay">
+      <div id="breakthrough-text"></div>
+      <div id="breakthrough-sub"></div>
+    </div>
+  </div>
+
+  <div id="controls-hint">WASD/方向键: 移动 | 空格: 暂停 | +/-: 变速</div>
+
+  <div id="mobile-controls">
+    <div class="dpad">
+      <div class="dpad-center"></div>
+      <div class="dpad-btn" id="btn-up">▲</div>
+      <div class="dpad-center"></div>
+      <div class="dpad-btn" id="btn-left">◀</div>
+      <div class="dpad-center"></div>
+      <div class="dpad-btn" id="btn-right">▶</div>
+      <div class="dpad-center"></div>
+      <div class="dpad-btn" id="btn-down">▼</div>
+      <div class="dpad-center"></div>
+    </div>
+  </div>
+
+  <div id="overlay-screen">
+    <div id="overlay-title">修仙贪吃蛇</div>
+    <div id="overlay-subtitle">吞噬灵果，突破境界，问道长生</div>
+    <div id="overlay-info"></div>
+    <div id="overlay-buttons">
+      <button class="btn" id="btn-start">开始修炼</button>
+      <button class="btn btn-secondary" id="btn-leaderboard">排行榜</button>
+    </div>
+    <div id="leaderboard-panel" style="display:none">
+      <h3>🏆 修为排行榜</h3>
+      <ul id="leaderboard-list"></ul>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

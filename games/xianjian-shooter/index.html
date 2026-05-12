@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>仙剑射击</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+  }
+  #game-container {
+    position: relative;
+    border: 3px solid #1a5276;
+    box-shadow: 0 0 30px rgba(33, 150, 243, 0.5);
+  }
+  canvas { display: block; }
+  #ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 18px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .ui-item {
+    background: rgba(0,0,0,0.6);
+    padding: 5px 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+  }
+  #start-screen, #game-over-screen, #pause-screen, #boss-warning {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 20, 60, 0.9);
+    color: #fff;
+    z-index: 20;
+  }
+  #start-screen h1, #game-over-screen h1 {
+    font-size: 48px;
+    color: #64b5f6;
+    text-shadow: 0 0 20px #1e88e5, 0 0 40px #1565c0;
+    margin-bottom: 20px;
+  }
+  #start-screen p, #game-over-screen p {
+    font-size: 16px;
+    margin: 5px 0;
+    color: #bbdefb;
+  }
+  .btn {
+    margin-top: 15px;
+    padding: 15px 40px;
+    font-size: 24px;
+    background: linear-gradient(135deg, #1565c0, #1e88e5);
+    color: #fff;
+    border: 2px solid #64b5f6;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    transition: all 0.3s;
+    font-family: 'Courier New', monospace;
+  }
+  .btn:hover {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.6);
+    transform: scale(1.05);
+  }
+  .btn-small {
+    padding: 8px 20px;
+    font-size: 16px;
+  }
+  .hidden { display: none !important; }
+  #final-score {
+    font-size: 36px;
+    color: #ffd54f;
+    text-shadow: 0 0 15px #ff8f00;
+    margin: 20px 0;
+  }
+
+  /* Pause Screen */
+  #pause-screen {
+    background: rgba(0, 20, 60, 0.85);
+    backdrop-filter: blur(4px);
+  }
+  #pause-screen h1 {
+    font-size: 48px;
+    color: #bbdefb;
+    text-shadow: 0 0 20px #1e88e5;
+    margin-bottom: 10px;
+  }
+
+  /* Boss Warning */
+  #boss-warning {
+    background: rgba(80, 0, 0, 0.95);
+    z-index: 25;
+  }
+  #boss-warning h1 {
+    font-size: 52px;
+    color: #ff1744;
+    text-shadow: 0 0 30px #d50000, 0 0 60px #b71c1c;
+    animation: bossPulse 0.5s ease-in-out infinite alternate;
+  }
+  #boss-warning p {
+    font-size: 20px;
+    color: #ff8a80;
+    margin-top: 15px;
+  }
+  @keyframes bossPulse {
+    from { transform: scale(1); text-shadow: 0 0 30px #d50000; }
+    to { transform: scale(1.1); text-shadow: 0 0 50px #d50000, 0 0 80px #b71c1c; }
+  }
+
+  /* Leaderboard */
+  #leaderboard-container {
+    margin: 15px 0;
+    width: 80%;
+    max-width: 400px;
+  }
+  #leaderboard-container h2 {
+    font-size: 24px;
+    color: #ffd54f;
+    text-shadow: 0 0 10px #ff8f00;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #leaderboard-table th {
+    color: #64b5f6;
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    font-size: 14px;
+  }
+  #leaderboard-table td {
+    padding: 5px 10px;
+    color: #fff;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  #leaderboard-table tr.highlight {
+    background: rgba(255, 213, 79, 0.3);
+    animation: highlightPulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes highlightPulse {
+    from { background: rgba(255, 213, 79, 0.2); }
+    to { background: rgba(255, 213, 79, 0.4); }
+  }
+  #leaderboard-table tr td:nth-child(1) { text-align: center; width: 40px; }
+  #leaderboard-table tr td:nth-child(3) { text-align: right; }
+  #leaderboard-table tr td:nth-child(4) { text-align: right; font-size: 12px; color: #90caf9; }
+
+  /* Name Input */
+  #name-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  #name-input-row label {
+    color: #bbdefb;
+    font-size: 16px;
+  }
+  #player-name-input {
+    padding: 8px 15px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    outline: none;
+    width: 150px;
+  }
+  #player-name-input:focus {
+    border-color: #64b5f6;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.4);
+  }
+
+  /* Sound Toggle in UI */
+  #sound-toggle {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+    transition: all 0.2s;
+  }
+  #sound-toggle:hover {
+    background: rgba(0,0,0,0.8);
+    border-color: #64b5f6;
+  }
+  #mobile-controls {
+    position: absolute; bottom: 15px; left: 15px; right: 15px;
+    z-index: 15; display: none;
+    justify-content: space-between; align-items: flex-end;
+    pointer-events: none;
+  }
+  .joystick-area {
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2);
+    position: relative; pointer-events: auto; touch-action: none;
+  }
+  .joystick-knob {
+    width: 45px; height: 45px; border-radius: 50%;
+    background: rgba(74,158,255,0.4); border: 2px solid #4a9eff;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .fire-btn-mobile {
+    width: 70px; height: 70px; border-radius: 50%;
+    border: 2px solid rgba(255,215,0,0.5); background: rgba(255,215,0,0.3);
+    color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+    cursor: pointer; pointer-events: auto;
+  }
+  .fire-btn-mobile:active { background: rgba(255,215,0,0.6); }
+  @media (pointer: coarse) { #mobile-controls { display: flex; } }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <canvas id="game" width="480" height="640"></canvas>
+  
+  <div id="ui">
+    <div class="ui-item">💯 分数: <span id="score">0</span></div>
+    <div class="ui-item">❤️ 生命: <span id="lives">3</span></div>
+    <div class="ui-item">⚔️ 关卡: <span id="level">1</span></div>
+  </div>
+
+  <button id="sound-toggle" title="音效开关">🔊</button>
+  
+  <div id="start-screen">
+    <h1>🗡️ 仙剑射击</h1>
+    <p>踩踏仙剑，御剑飞行</p>
+    <p>发射飞剑，斩妖除魔</p>
+    <p style="margin-top: 20px;">🎮 操作说明</p>
+    <p>⬆️⬇️⬅️➡️ / WASD 移动</p>
+    <p>🔥 空格键 / 鼠标左键 发射飞剑</p>
+    <p>⏸️ P 键暂停/继续</p>
+    <p>🔊 右下角切换音效</p>
+    <button class="btn" onclick="startGame()">开始修仙</button>
+  </div>
+  
+  <div id="game-over-screen" class="hidden">
+    <h1>💀 渡劫失败</h1>
+    <div id="final-score">0</div>
+    <div id="name-input-row">
+      <label>名字:</label>
+      <input type="text" id="player-name-input" maxlength="10" value="修仙者" placeholder="输入名字">
+    </div>
+    <button class="btn btn-small" onclick="submitScore()">保存成绩</button>
+    <div id="leaderboard-container">
+      <h2>🏆 排行榜</h2>
+      <table id="leaderboard-table">
+        <thead>
+          <tr><th>#</th><th>名字</th><th>分数</th><th>日期</th></tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+    <button class="btn" onclick="startGame()">再来一次</button>
+  </div>
+
+  <div id="pause-screen" class="hidden">
+    <h1>⏸️ 暂停</h1>
+    <p>按 P 键继续</p>
+    <p style="margin-top: 10px; font-size: 14px; color: #90caf9;">Boss 战中无法暂停</p>
+  </div>
+
+  <div id="boss-warning" class="hidden">
+    <h1>⚠️ Boss 来袭！</h1>
+    <p id="boss-warning-text">巨大妖怪出现了！</p>
+  </div>
+  <div id="mobile-controls">
+    <div class="joystick-area" id="joystick">
+      <div class="joystick-knob" id="joystick-knob"></div>
+    </div>
+    <div class="fire-btn-mobile" id="btn-fire-mobile">🗡️</div>
+  </div>
+</div>
+
+<script src="game.js?v=2"></script>
+</body>
+</html>
