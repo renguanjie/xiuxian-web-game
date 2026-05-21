@@ -19,23 +19,25 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(username: string, password: string) {
     const res: any = await authApi.login({ username, password })
-    if (!res.data?.access_token) {
-      throw new Error('登录响应异常，请重试')
+    const data = res.data
+    if (!data?.access_token) {
+      throw new Error(res.message || '登录失败，请重试')
     }
-    accessToken.value = res.data.access_token
-    refreshToken.value = res.data.refresh_token
-    user.value = res.data.user
-    localStorage.setItem('access_token', res.data.access_token)
-    localStorage.setItem('refresh_token', res.data.refresh_token)
+    accessToken.value = data.access_token
+    refreshToken.value = data.refresh_token
+    user.value = data.user
+    localStorage.setItem('access_token', data.access_token)
+    localStorage.setItem('refresh_token', data.refresh_token)
   }
 
   async function register(username: string, email: string, password: string, confirmPassword: string) {
     const res = await authApi.register({ username, email, password, confirm_password: confirmPassword })
-    accessToken.value = res.data.access_token
-    refreshToken.value = res.data.refresh_token
-    user.value = res.data.user
-    localStorage.setItem('access_token', res.data.access_token)
-    localStorage.setItem('refresh_token', res.data.refresh_token)
+    const data = res.data
+    accessToken.value = data.access_token
+    refreshToken.value = data.refresh_token
+    user.value = data.user
+    localStorage.setItem('access_token', data.access_token)
+    localStorage.setItem('refresh_token', data.refresh_token)
   }
 
   function logout() {

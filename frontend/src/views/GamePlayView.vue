@@ -12,7 +12,7 @@
     <template v-else-if="game">
       <!-- 标题行 -->
       <div class="flex items-start justify-between mb-4">
-        <h1 class="text-2xl font-bold">{{ game.name }}</h1>
+        <h1 class="text-xl sm:text-2xl font-bold">{{ game.name }}</h1>
         <!-- 收藏按钮 -->
         <button
           v-if="authStore.isAuthenticated"
@@ -51,7 +51,7 @@
       </div>
 
       <!-- 游戏描述 -->
-      <div class="mt-6 bg-bg-secondary rounded-game p-6 animate-slide-up">
+      <div class="mt-4 sm:mt-6 bg-bg-secondary rounded-game p-4 sm:p-6 animate-slide-up">
         <h2 class="text-lg font-semibold mb-2">游戏描述</h2>
         <p class="text-text-secondary leading-relaxed">{{ game.description }}</p>
       </div>

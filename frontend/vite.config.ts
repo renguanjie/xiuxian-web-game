@@ -13,11 +13,11 @@ export default defineConfig({
     port: 5103,
     proxy: {
       '/api': {
-        target: 'http://localhost:8100',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
-      '/games': {
-        target: 'http://localhost:8100',
+      '/static/games': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },

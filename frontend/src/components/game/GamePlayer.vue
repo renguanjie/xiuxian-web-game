@@ -1,13 +1,13 @@
-<!-- 游戏播放器 - iframe 嵌入 + 全屏模式 -->
+<!-- 游戏播放器 - iframe 嵌入 + 全屏模式 + 移动端适配 -->
 <template>
   <div class="game-player">
     <!-- 顶部工具栏 -->
-    <div class="flex items-center justify-between mb-4">
-      <a class="text-text-secondary hover:text-text-primary transition-colors cursor-pointer" @click="goBack">
+    <div class="flex items-center justify-between mb-3 sm:mb-4 px-1 sm:px-0">
+      <a class="text-text-secondary hover:text-text-primary transition-colors cursor-pointer text-sm sm:text-base" @click="goBack">
         ← 返回大厅
       </a>
       <div class="flex items-center gap-2">
-        <RouterLink :to="`/leaderboard/${gameId}`" class="text-text-secondary hover:text-text-primary text-sm">
+        <RouterLink :to="`/leaderboard/${gameId}`" class="text-text-secondary hover:text-text-primary text-xs sm:text-sm">
           🏆 排行榜
         </RouterLink>
         <el-button size="small" @click="toggleFullscreen">
@@ -16,15 +16,26 @@
       </div>
     </div>
 
+    <!-- 竖屏旋转提示 -->
+    <div v-if="isPortrait && !hintDismissed" class="landscape-hint" @click="dismissHint">
+      <div class="hint-content">
+        <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 4v6h6M23 20v-6h-6"/>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+        </svg>
+        <span>旋转设备横屏以获得最佳体验</span>
+        <span class="dismiss-text">点击关闭</span>
+      </div>
+    </div>
+
     <!-- 游戏 iframe -->
-    <div ref="playerContainer" class="relative bg-bg-secondary rounded-game overflow-hidden" tabindex="0">
+    <div ref="playerContainer" class="relative bg-bg-secondary rounded-game overflow-hidden touch-none" tabindex="0">
       <iframe
         :src="gameUrl"
         sandbox="allow-scripts allow-same-origin allow-popups allow-modals"
         allow="fullscreen; gamepad; autoplay"
         referrerpolicy="no-referrer"
-        class="w-full"
-        :style="{ aspectRatio: '16/9' }"
+        class="w-full game-iframe"
         @load="onIframeLoad"
         @error="onIframeError"
       />
@@ -58,10 +69,21 @@ const playerContainer = ref<HTMLElement | null>(null)
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(playerContainer)
 const loading = ref(true)
 const error = ref(false)
+const isPortrait = ref(false)
+const hintDismissed = ref(false)
 
 const gameUrl = computed(() => {
-  return `/games/${props.path}`
+  return `/static/games/${props.path}`
 })
+
+function updateOrientation() {
+  isPortrait.value = window.matchMedia('(orientation: portrait)').matches
+  if (!isPortrait.value) hintDismissed.value = false
+}
+
+function dismissHint() {
+  hintDismissed.value = true
+}
 
 function onIframeLoad() {
   loading.value = false
@@ -95,9 +117,88 @@ function stopPropagation(event: KeyboardEvent) {
 // 在 window 层级拦截滚动键，防止 iframe 冒泡
 onMounted(() => {
   window.addEventListener('keydown', stopPropagation, true)
+  updateOrientation()
+  const mql = window.matchMedia('(orientation: portrait)')
+  mql.addEventListener('change', updateOrientation)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', stopPropagation, true)
+  const mql = window.matchMedia('(orientation: portrait)')
+  mql.removeEventListener('change', updateOrientation)
 })
 </script>
+
+<style scoped>
+.game-player {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.touch-none {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.game-iframe {
+  aspect-ratio: 9/16;
+  object-fit: contain;
+}
+
+@media (orientation: landscape) {
+  .game-iframe {
+    aspect-ratio: 16/9;
+  }
+}
+
+.landscape-hint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(10, 10, 18, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  animation: hint-fade-in 0.3s ease-out;
+}
+
+@keyframes hint-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hint-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #f0f0f5;
+  font-size: 16px;
+}
+
+.dismiss-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.rotate-icon {
+  width: 64px;
+  height: 64px;
+  color: #ff6b00;
+  animation: rotate-hint 2s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-90deg); }
+  50% { transform: rotate(-90deg); }
+  75% { transform: rotate(0deg); }
+}
+</style>

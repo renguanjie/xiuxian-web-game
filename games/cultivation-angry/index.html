@@ -13,7 +13,7 @@ html, body { width: 100%; height: 100%; background: #0a0a12; overflow: hidden; f
 #realm-name { font-size: 22px; font-weight: bold; color: #fff; text-shadow: 0 0 10px currentColor; }
 #score-display { color: #ffd700; font-size: 18px; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
 #level-display, #lives-display, #hp-display { color: #ccc; font-size: 14px; }
-canvas { display: block; border-radius: 4px; }
+canvas { display: block; max-width: 100%; height: auto; border-radius: 4px; }
 #overlay-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5,5,15,0.92); }
 #overlay-screen.hidden { opacity: 0; pointer-events: none; }
 #overlay-title { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #ff6b00, 0 0 40px #ff4400; margin-bottom: 8px; }

@@ -50,7 +50,7 @@ docker compose exec backend python seed.py
 ```bash
 cd backend
 source venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8100
+uvicorn main:app --reload --host 0.0.0.0 --port 8100
 ```
 
 ### 4. 启动前端
@@ -71,16 +71,17 @@ npm run dev
 ```
 PythonWebGameProject/
 ├── backend/                    # FastAPI 后端
-│   ├── app/
-│   │   ├── models/             # SQLAlchemy 模型定义
-│   │   ├── routers/            # API 路由 (auth, games, users, records, leaderboards)
-│   │   ├── services/           # 业务逻辑
-│   │   ├── schemas/            # Pydantic 请求/响应模型
-│   │   ├── utils/              # 工具函数 (jwt, password)
-│   │   ├── database.py         # 数据库连接与初始化
-│   │   ├── config.py           # 配置 (从 .env 加载)
-│   │   ├── main.py             # FastAPI 应用入口
-│   │   └── exceptions/         # 全局异常处理
+│   ├── models/                 # SQLAlchemy 模型定义
+│   ├── routers/                # API 路由 (auth, games, users, records, leaderboards)
+│   ├── services/               # 业务逻辑
+│   ├── schemas/                # Pydantic 请求/响应模型
+│   ├── utils/                  # 工具函数 (jwt, password)
+│   ├── alembic/                # 数据库迁移
+│   ├── database.py             # 数据库连接与初始化
+│   ├── config.py               # 配置 (从 .env 加载)
+│   ├── main.py                 # FastAPI 应用入口
+│   ├── dependencies.py         # 依赖注入
+│   ├── rate_limit.py           # 速率限制
 │   ├── seed.py                 # 种子数据脚本
 │   ├── init.sql                # 数据库初始化 SQL
 │   └── requirements.txt

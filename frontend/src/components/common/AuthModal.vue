@@ -6,6 +6,7 @@
     :show-close="true"
     :close-on-click-modal="false"
     :destroy-on-close="false"
+    :append-to-body="true"
     @close="handleClose"
   >
     <template #header>
@@ -28,20 +29,20 @@
     </template>
 
     <!-- 登录表单 -->
-    <el-form v-if="activeTab === 'login'" :model="loginForm" :rules="loginRules" ref="loginFormRef" label-position="top" @submit.prevent="handleLogin">
+    <el-form v-if="activeTab === 'login'" :model="loginForm" :rules="loginRules" ref="loginFormRef" label-position="top">
       <el-form-item label="用户名 / 邮箱" prop="username">
         <el-input v-model="loginForm.username" placeholder="请输入用户名或邮箱" size="large" />
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" size="large" show-password />
       </el-form-item>
-      <el-button type="primary" size="large" class="w-full" :loading="loading" native-type="submit">
+      <el-button type="primary" size="large" class="w-full" :loading="loading" @click="handleLogin">
         登录
       </el-button>
     </el-form>
 
     <!-- 注册表单 -->
-    <el-form v-else :model="registerForm" :rules="registerRules" ref="registerFormRef" label-position="top" @submit.prevent="handleRegister">
+    <el-form v-else :model="registerForm" :rules="registerRules" ref="registerFormRef" label-position="top">
       <el-form-item label="用户名" prop="username">
         <el-input v-model="registerForm.username" placeholder="3-32个字符" size="large" />
       </el-form-item>
@@ -54,7 +55,7 @@
       <el-form-item label="确认密码" prop="confirmPassword">
         <el-input v-model="registerForm.confirmPassword" type="password" placeholder="再次输入密码" size="large" show-password />
       </el-form-item>
-      <el-button type="primary" size="large" class="w-full" :loading="loading" native-type="submit">
+      <el-button type="primary" size="large" class="w-full" :loading="loading" @click="handleRegister">
         注册
       </el-button>
     </el-form>

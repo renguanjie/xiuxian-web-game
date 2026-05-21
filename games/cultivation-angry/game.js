@@ -420,19 +420,23 @@ let time = 0;
 particles = [];
 
 function loop(ts) {
-  time = ts * 0.001;
-  update();
-  ctx.fillStyle = '#0a0a12'; ctx.fillRect(0, 0, W, H);
-  drawStars();
-  drawGrid();
-  drawPowerups();
-  drawEnemies();
-  drawPlayer();
-  drawBullets();
-  drawParticles();
-  if (state.levelTransition > 0) drawLevelComplete();
-  if (paused) drawPaused();
-  updateUI();
+  try {
+    time = ts * 0.001;
+    update();
+    ctx.fillStyle = '#0a0a12'; ctx.fillRect(0, 0, W, H);
+    drawStars();
+    drawGrid();
+    drawPowerups();
+    drawEnemies();
+    drawPlayer();
+    drawBullets();
+    drawParticles();
+    if (state.levelTransition > 0) drawLevelComplete();
+    if (paused) drawPaused();
+    updateUI();
+  } catch (e) {
+    console.error('cultivation-angry game error:', e);
+  }
   requestAnimationFrame(loop);
 }
 

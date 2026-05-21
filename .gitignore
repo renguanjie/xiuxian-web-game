@@ -5,12 +5,14 @@ __pycache__/
 *.egg-info/
 dist/
 venv/
-venv2/
+.venv/
 .env
 
 # Node
 node_modules/
 frontend/dist/
+
+# OS
 .DS_Store
 
 # IDE
@@ -22,8 +24,4 @@ frontend/dist/
 docker-compose.override.yml
 
 # Database backups
-*.sql
 backup_*.sql
-
-# Claude
-.claude/

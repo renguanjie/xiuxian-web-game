@@ -16,6 +16,7 @@
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg-primary, #0a0a12);
     color: var(--text-primary, #f0f0f5);
+    overscroll-behavior: none;
   }
 
   img, picture, video, canvas, svg {

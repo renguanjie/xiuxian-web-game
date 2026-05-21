@@ -100,6 +100,44 @@
     cursor: pointer; margin-top: 16px;
   }
   .fly-btn:hover { transform: scale(1.05); }
+  .controls-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+  }
+  #mobile-controls {
+    position: absolute;
+    bottom: 10px;
+    left: 0; right: 0;
+    z-index: 15;
+    display: none;
+    justify-content: center;
+    gap: 20px;
+  }
+  .dpad-btn {
+    width: 64px; height: 64px;
+    border: 2px solid rgba(204,136,255,0.4);
+    background: rgba(204,136,255,0.15);
+    border-radius: 12px;
+    color: #cc88ff;
+    font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none;
+    touch-action: none; cursor: pointer;
+  }
+  .dpad-btn:active { background: rgba(204,136,255,0.4); border-color: #cc88ff; }
+  @media (pointer: coarse) {
+    .game-container { width: 100vw; max-width: 480px; }
+    canvas { width: 100% !important; height: auto !important; }
+    #mobile-controls { display: flex; }
+    .controls-hint { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -137,6 +175,12 @@
     <p id="finalRealm">最高境界：凡人</p>
     <p id="finalHeight">攀登高度：0m</p>
     <button class="fly-btn" onclick="startGame()">再次飞升</button>
+  </div>
+
+  <div class="controls-hint">⬅️➡️ 控制左右移动</div>
+  <div id="mobile-controls">
+    <div class="dpad-btn" id="btn-left">⬅️</div>
+    <div class="dpad-btn" id="btn-right">➡️</div>
   </div>
 </div>
 

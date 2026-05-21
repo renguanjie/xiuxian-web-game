@@ -2,8 +2,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import 'element-plus/dist/index.css'
 
-// 按需导入 Element Plus 组件
-import { ElButton, ElForm, ElFormItem, ElInput, ElDialog, ElPagination, ElMessage } from 'element-plus'
+import {
+  ElButton, ElForm, ElFormItem, ElInput, ElDialog, ElPagination,
+  ElMessage, ElDropdown, ElDropdownMenu, ElDropdownItem, ElIcon,
+} from 'element-plus'
+
+import { ArrowDown } from '@element-plus/icons-vue'
 
 import App from './App.vue'
 import router from './router'
@@ -15,15 +19,18 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-// 注册按需导入的组件
 app.component('ElButton', ElButton)
 app.component('ElForm', ElForm)
 app.component('ElFormItem', ElFormItem)
 app.component('ElInput', ElInput)
 app.component('ElDialog', ElDialog)
 app.component('ElPagination', ElPagination)
+app.component('ElDropdown', ElDropdown)
+app.component('ElDropdownMenu', ElDropdownMenu)
+app.component('ElDropdownItem', ElDropdownItem)
+app.component('ElIcon', ElIcon)
+app.component('ArrowDown', ArrowDown)
 
-// 将 ElMessage 挂载到全局属性
 app.config.globalProperties.$message = ElMessage
 
 app.mount('#app')

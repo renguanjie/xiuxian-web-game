@@ -430,6 +430,18 @@
 
   document.getElementById('restartBtn').addEventListener('click', startGame);
 
+  // Dpad button controls for mobile
+  function bindDpadBtn(id, key) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+    btn.addEventListener('mousedown', (e) => { keys[key] = true; });
+    btn.addEventListener('mouseup', (e) => { keys[key] = false; });
+  }
+  bindDpadBtn('btn-left', 'left');
+  bindDpadBtn('btn-right', 'right');
+
   // roundRect polyfill
   if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
