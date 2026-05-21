@@ -4,8 +4,8 @@
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Nginx     │────▶│  FastAPI     │────▶│   MySQL     │
-│   (前端)    │     │  (后端 :8100)│     │   (:3306)   │
+│   Nginx     │────▶│  FastAPI     │────▶│ PostgreSQL  │
+│   (前端)    │     │  (后端 :8000)│     │   (Neon)    │
 │   (:80)     │     │              │     │             │
 └─────────────┘     └──────────────┘     └─────────────┘
      │                      │
@@ -22,7 +22,13 @@ PythonWebGameProject/
 ├── backend/
 │   ├── Dockerfile              # 后端镜像
 │   ├── requirements.txt
-│   └── app/
+│   ├── main.py                 # FastAPI 应用入口
+│   ├── models/                 # SQLAlchemy 模型
+│   ├── routers/                # API 路由
+│   ├── services/               # 业务逻辑
+│   ├── schemas/                # Pydantic 模型
+│   ├── utils/                  # 工具函数
+│   └── alembic/                # 数据库迁移
 ├── frontend/
 │   ├── Dockerfile              # 前端构建镜像
 │   └── src/
@@ -36,7 +42,7 @@ PythonWebGameProject/
 
 ```bash
 cp .env.example .env
-# 编辑 .env，修改数据库密码和 SECRET_KEY
+# 编辑 .env，修改 DATABASE_URL 和 SECRET_KEY
 ```
 
 ### 2. 生成 SECRET_KEY
@@ -60,8 +66,8 @@ docker compose exec backend python seed.py
 ### 5. 访问
 
 - 前端: http://localhost
-- API: http://localhost/api/v1
-- API 文档: http://localhost/api/docs
+- API: http://localhost/api
+- API 文档: http://localhost/docs
 
 ## 配置文件说明
 
@@ -69,39 +75,68 @@ docker compose exec backend python seed.py
 
 | 服务 | 镜像 | 端口 | 说明 |
 |------|------|------|------|
-| mysql | mysql:8.0 | 3306 (仅内网) | 数据库 |
-| backend | 本地构建 | 8100 (仅内网) | FastAPI 后端 |
+| backend | 本地构建 | 8000 (仅内网) | FastAPI 后端 |
 | frontend | nginx:alpine | 80 | Nginx 静态服务 + 反向代理 |
+
+> 数据库使用 Neon Serverless PostgreSQL（外部服务），无需本地数据库容器。
 
 ### Nginx 代理规则
 
 | 路径 | 转发目标 | 说明 |
 |------|----------|------|
 | `/` | 前端静态文件 | Vue SPA |
-| `/api/*` | http://backend:8100 | API 请求 |
-| `/games/*` | http://backend:8100 | 游戏静态文件 |
-| `/api/docs` | http://backend:8100 | Swagger 文档 |
+| `/api/*` | http://backend:8000 | API 请求 |
+| `/games/*` | http://backend:8000 | 游戏静态文件 |
+| `/docs` | http://backend:8000 | Swagger 文档 |
 
 ### 环境变量
 
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
-| `MYSQL_ROOT_PASSWORD` | MySQL root 密码 | `xiuxian_root_2024` |
-| `MYSQL_DATABASE` | 数据库名 | `xiuxian_games` |
-| `DB_PASSWORD` | 后端数据库密码 | 同 `MYSQL_ROOT_PASSWORD` |
+| `DATABASE_URL` | PostgreSQL 连接字符串 | **必须配置** |
 | `SECRET_KEY` | JWT 签名密钥 | **必须修改** |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | 访问令牌过期时间 | `15` |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | 刷新令牌过期时间 | `30` |
+| `DEBUG` | 调试模式 | `false` |
+
+## 数据库
+
+### Neon Serverless PostgreSQL
+
+本项目默认使用 [Neon](https://neon.tech/) Serverless PostgreSQL。
+
+连接字符串格式:
+```
+postgresql+asyncpg://<user>:<password>@<host>.neon.tech/<dbname>?sslmode=require
+```
+
+**注意事项:**
+- 使用直连端点（非 `-pooler` 端点），避免预编译语句缓存导致索引误报
+- `pool_pre_ping=True` 已配置以处理空闲连接断开
+- 本地开发时可使用任意 PostgreSQL 实例，修改 `.env` 中的 `DATABASE_URL` 即可
+
+### 本地 PostgreSQL
+
+```bash
+# 启动本地 PostgreSQL
+docker run -d --name postgres -e POSTGRES_PASSWORD=xiuxian -p 5432:5432 postgres:16
+
+# 创建数据库
+docker exec postgres psql -U postgres -c "CREATE DATABASE xiuxian_games;"
+
+# 更新 .env
+DATABASE_URL="postgresql+asyncpg://postgres:xiuxian@localhost:5432/xiuxian_games"
+```
 
 ## 生产环境注意事项
 
 ### 安全加固
 
-1. **修改所有默认密码** - 数据库密码、SECRET_KEY
+1. **修改所有默认凭证** - SECRET_KEY、数据库密码
 2. **启用 HTTPS** - 使用 Let's Encrypt 或商业证书
 3. **配置防火墙** - 仅开放 80/443 端口
 4. **设置 Nginx 速率限制** - 防止 DDoS
-5. **定期备份数据库** - 使用 `docker compose exec mysql mysqldump`
+5. **定期备份数据库** - 使用 `pg_dump` 或 Neon 内置备份
 
 ### 性能优化
 
@@ -120,7 +155,6 @@ docker compose logs -f
 # 查看单个服务日志
 docker compose logs -f backend
 docker compose logs -f frontend
-docker compose logs -f mysql
 ```
 
 ## 常见问题
@@ -128,7 +162,7 @@ docker compose logs -f mysql
 ### Q: 后端启动失败
 ```bash
 docker compose logs backend
-# 检查数据库连接和 SECRET_KEY
+# 检查 DATABASE_URL 和 SECRET_KEY
 ```
 
 ### Q: 前端页面空白
@@ -139,8 +173,8 @@ docker compose logs frontend
 
 ### Q: 数据库连接失败
 ```bash
-docker compose exec mysql mysql -u root -p
-# 检查数据库是否创建，用户权限是否正确
+# 检查 .env 中 DATABASE_URL 是否正确
+# 确认网络连接和 SSL 配置
 ```
 
 ### Q: 如何更新代码
@@ -149,12 +183,13 @@ git pull
 docker compose up -d --build backend
 ```
 
-### Q: 如何备份数据库
+### Q: 如何备份数据库 (Neon)
+Neon 支持时间旅行恢复，也可手动导出:
 ```bash
-docker compose exec mysql mysqldump -u root -p xiuxian_games > backup_$(date +%Y%m%d).sql
+pg_dump "$DATABASE_URL" > backup_$(date +%Y%m%d).sql
 ```
 
 ### Q: 如何恢复数据库
 ```bash
-docker compose exec -T mysql mysql -u root -p xiuxian_games < backup_20260512.sql
+psql "$DATABASE_URL" < backup_20260521.sql
 ```
