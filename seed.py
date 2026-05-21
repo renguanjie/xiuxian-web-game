@@ -1,10 +1,6 @@
 """种子数据脚本 - 初始化游戏、角色、成就"""
 import asyncio
 import json
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(__file__))
 
 from sqlalchemy import text
 from database import async_session

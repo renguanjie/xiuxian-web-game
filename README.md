@@ -36,13 +36,13 @@
 
 ```bash
 # 同时启动前后端
-python main.py
+python dev.py
 
 # 仅启动后端
-python main.py backend
+python dev.py backend
 
 # 仅启动前端
-python main.py frontend
+python dev.py frontend
 ```
 
 ### 4. 访问
@@ -55,24 +55,24 @@ python main.py frontend
 
 ```
 PythonWebGameProject/
-├── backend/                    # FastAPI 后端
-│   ├── models/                 # SQLAlchemy 模型定义
-│   ├── routers/                # API 路由 (auth, games, users, records, leaderboards, reviews)
-│   ├── services/               # 业务逻辑
-│   ├── schemas/                # Pydantic 请求/响应模型
-│   ├── utils/                  # 工具函数 (jwt, password, token_hash)
-│   ├── middleware/             # 中间件 (安全、限流)
-│   ├── exceptions/             # 异常处理
-│   ├── alembic/                # 数据库迁移
-│   ├── database.py             # 数据库连接 (asyncpg)
-│   ├── config.py               # 配置 (从 .env 加载)
-│   ├── main.py                 # FastAPI 应用入口
-│   ├── dependencies.py         # 依赖注入
-│   ├── rate_limit.py           # 速率限制
-│   ├── seed.py                 # 种子数据脚本
-│   ├── init.sql                # 数据库初始化 SQL
-│   ├── rebuild_db.py           # 重建数据库脚本
-│   └── requirements.txt
+├── main.py                     # FastAPI 应用入口
+├── dev.py                      # 开发启动脚本 (并发前后端)
+├── config.py                   # 配置 (从 .env 加载)
+├── database.py                 # 数据库连接 (asyncpg)
+├── dependencies.py             # 依赖注入
+├── rate_limit.py               # 速率限制
+├── seed.py                     # 种子数据脚本
+├── rebuild_db.py               # 重建数据库脚本
+├── init.sql                    # 数据库初始化 SQL
+├── requirements.txt            # Python 依赖
+├── models/                     # SQLAlchemy 模型定义
+├── routers/                    # API 路由 (auth, games, users, records, leaderboards, reviews)
+├── services/                   # 业务逻辑
+├── schemas/                    # Pydantic 请求/响应模型
+├── utils/                      # 工具函数 (jwt, password, token_hash)
+├── middleware/                 # 中间件 (安全、限流)
+├── exceptions/                 # 异常处理
+├── alembic/                    # 数据库迁移
 ├── frontend/                   # Vue 3 前端
 │   ├── src/
 │   │   ├── api/                # Axios 实例与 API 调用
@@ -90,8 +90,7 @@ PythonWebGameProject/
 │   ├── cultivation-tower-defense/
 │   └── xianjian-shooter/
 ├── .env                        # 环境变量
-├── setup.sh                    # 一键初始化脚本
-└── main.py                     # 开发启动脚本 (并发前后端)
+└── setup.sh                    # 一键初始化脚本
 ```
 
 ## 环境变量
@@ -120,10 +119,10 @@ PythonWebGameProject/
 
 ```bash
 # 方式一：运行 init.sql
-psql $DATABASE_URL -f backend/init.sql
+psql $DATABASE_URL -f init.sql
 
 # 方式二：使用 SQLAlchemy create_all
-python backend/rebuild_db.py
+python rebuild_db.py
 ```
 
 ## 注意事项

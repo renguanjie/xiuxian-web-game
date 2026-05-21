@@ -1,9 +1,5 @@
 """清空并重建数据库表"""
 import asyncio
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(__file__))
 
 from sqlalchemy import text
 from database import engine

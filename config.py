@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:5103", "http://localhost:3000"]
 
     model_config = {
-        "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
+        "env_file": str(Path(__file__).resolve().parent / ".env"),
         "env_file_encoding": "utf-8",
     }
 

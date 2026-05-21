@@ -19,16 +19,15 @@
 PythonWebGameProject/
 ├── docker-compose.yml          # Docker Compose 配置
 ├── nginx.conf                  # Nginx 配置
-├── backend/
-│   ├── Dockerfile              # 后端镜像
-│   ├── requirements.txt
-│   ├── main.py                 # FastAPI 应用入口
-│   ├── models/                 # SQLAlchemy 模型
-│   ├── routers/                # API 路由
-│   ├── services/               # 业务逻辑
-│   ├── schemas/                # Pydantic 模型
-│   ├── utils/                  # 工具函数
-│   └── alembic/                # 数据库迁移
+├── Dockerfile                  # 后端镜像
+├── requirements.txt            # Python 依赖
+├── main.py                     # FastAPI 应用入口
+├── models/                     # SQLAlchemy 模型
+├── routers/                    # API 路由
+├── services/                   # 业务逻辑
+├── schemas/                    # Pydantic 模型
+├── utils/                      # 工具函数
+├── alembic/                    # 数据库迁移
 ├── frontend/
 │   ├── Dockerfile              # 前端构建镜像
 │   └── src/
