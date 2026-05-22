@@ -63,7 +63,6 @@ PythonWebGameProject/
 ├── rate_limit.py               # 速率限制
 ├── seed.py                     # 种子数据脚本
 ├── rebuild_db.py               # 重建数据库脚本
-├── init.sql                    # 数据库初始化 SQL
 ├── requirements.txt            # Python 依赖
 ├── models/                     # SQLAlchemy 模型定义
 ├── routers/                    # API 路由 (auth, games, users, records, leaderboards, reviews)
@@ -98,9 +97,11 @@ PythonWebGameProject/
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `DATABASE_URL` | PostgreSQL 连接字符串 | `postgresql+asyncpg://...` |
+| `DB_SSL` | 是否为 asyncpg 连接启用 SSL | `false` |
 | `SECRET_KEY` | JWT 签名密钥 | 开发环境默认值 |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | 访问令牌过期时间 | `15` |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | 刷新令牌过期时间 | `30` |
+| `TRUSTED_PROXY_IPS` | 可信反向代理 IP/CIDR 列表 | `["127.0.0.1","::1"]` |
 | `DEBUG` | 调试模式 | `false` |
 
 ## 数据库
@@ -113,16 +114,14 @@ PythonWebGameProject/
 
 如果使用 Neon，注意：
 - 使用直连端点（非 `-pooler` 端点）避免预编译语句缓存问题
+- 设置 `DB_SSL=true`；如果连接字符串带 `sslmode=require`，程序会自动转换为 asyncpg 支持的 SSL 参数
 - `pool_pre_ping=True` 已配置以处理空闲连接断开
 
 ### 初始化表结构
 
 ```bash
-# 方式一：运行 init.sql
-psql $DATABASE_URL -f init.sql
-
-# 方式二：使用 SQLAlchemy create_all
 python rebuild_db.py
+python seed.py
 ```
 
 ## 注意事项

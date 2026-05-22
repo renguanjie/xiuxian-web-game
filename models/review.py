@@ -20,6 +20,6 @@ class GameReview(Base):
     user = relationship("User", lazy="selectin")
 
     __table_args__ = (
-        Index("idx_grv_game_created", "game_id", "created_at"),
-        Index("idx_grv_user_game", "user_id", "game_id"),
+        Index("idx_game_review_game_created", "game_id", "created_at"),
+        Index("idx_game_review_user_game", "user_id", "game_id"),
     )

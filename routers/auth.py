@@ -1,10 +1,10 @@
 """认证路由 - 注册、登录、刷新令牌"""
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from schemas.auth import RegisterRequest, LoginRequest, TokenResponse, RefreshRequest
-from schemas.common import ApiResponse, ErrorCodes
+from schemas.common import ApiResponse
 from services.auth_service import AuthService
 from rate_limit import limiter
 
@@ -25,6 +25,7 @@ async def register(
         email=req.email,
         password=req.password,
         ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
     )
     return ApiResponse(data=result, message="注册成功")
 
@@ -42,6 +43,7 @@ async def login(
         username=req.username,
         password=req.password,
         ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
     )
     return ApiResponse(data=result)
 
@@ -58,5 +60,6 @@ async def refresh_token(
     result = await service.refresh(
         refresh_token=req.refresh_token,
         ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
     )
     return ApiResponse(data=result)

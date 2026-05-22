@@ -26,9 +26,9 @@ class Game(Base):
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-        Index("idx_slug", "slug"),
-        Index("idx_category", "category"),
-        Index("idx_status", "status"),
-        Index("idx_sort", "sort_order"),
-        Index("idx_play_count", "play_count"),
+        Index("idx_game_slug", "slug"),
+        Index("idx_game_category", "category"),
+        Index("idx_game_status", "status"),
+        Index("idx_game_sort_order", "sort_order"),
+        Index("idx_game_play_count", "play_count"),
     )

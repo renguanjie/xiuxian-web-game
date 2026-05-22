@@ -93,9 +93,11 @@ docker compose exec backend python seed.py
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `DATABASE_URL` | PostgreSQL 连接字符串 | **必须配置** |
+| `DB_SSL` | 是否为 asyncpg 连接启用 SSL | 生产建议 `true` |
 | `SECRET_KEY` | JWT 签名密钥 | **必须修改** |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | 访问令牌过期时间 | `15` |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | 刷新令牌过期时间 | `30` |
+| `TRUSTED_PROXY_IPS` | 可信反向代理 IP/CIDR 列表 | Docker 默认信任 bridge 网段 |
 | `DEBUG` | 调试模式 | `false` |
 
 ## 数据库
@@ -111,6 +113,7 @@ postgresql+asyncpg://<user>:<password>@<host>.neon.tech/<dbname>?sslmode=require
 
 **注意事项:**
 - 使用直连端点（非 `-pooler` 端点），避免预编译语句缓存导致索引误报
+- 设置 `DB_SSL=true`；如果连接字符串保留 `sslmode=require`，程序会转换为 asyncpg 支持的 SSL 参数
 - `pool_pre_ping=True` 已配置以处理空闲连接断开
 - 本地开发时可使用任意 PostgreSQL 实例，修改 `.env` 中的 `DATABASE_URL` 即可
 
@@ -125,6 +128,7 @@ docker exec postgres psql -U postgres -c "CREATE DATABASE xiuxian_games;"
 
 # 更新 .env
 DATABASE_URL="postgresql+asyncpg://postgres:xiuxian@localhost:5432/xiuxian_games"
+DB_SSL=false
 ```
 
 ## 生产环境注意事项

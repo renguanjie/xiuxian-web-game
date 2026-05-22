@@ -1,6 +1,5 @@
 """成就模型"""
 from sqlalchemy import Column, Integer, String, JSON, Float, TIMESTAMP, Index, ForeignKey, func
-from sqlalchemy.orm import relationship
 
 from database import Base
 
@@ -22,9 +21,9 @@ class Achievement(Base):
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
     __table_args__ = (
-        Index("idx_category", "category"),
-        Index("idx_rarity", "rarity"),
-        Index("idx_active", "is_active"),
+        Index("idx_achievement_category", "category"),
+        Index("idx_achievement_rarity", "rarity"),
+        Index("idx_achievement_active", "is_active"),
     )
 
 
@@ -39,6 +38,6 @@ class AchievementUnlocked(Base):
     progress = Column(Float, nullable=False, default=100.0, comment="完成百分比")
 
     __table_args__ = (
-        Index("uk_user_achievement", "user_id", "achievement_id", unique=True),
-        Index("idx_user", "user_id"),
+        Index("uk_achievement_unlock_user_achievement", "user_id", "achievement_id", unique=True),
+        Index("idx_achievement_unlock_user", "user_id"),
     )

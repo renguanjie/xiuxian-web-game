@@ -11,14 +11,22 @@ async def rebuild():
         # First drop all indexes that might linger
         indexes = [
             "idx_category", "idx_rarity", "idx_active",
+            "idx_achievement_category", "idx_achievement_rarity", "idx_achievement_active",
             "idx_slug", "idx_status", "idx_sort", "idx_play_count",
+            "idx_game_slug", "idx_game_category", "idx_game_status",
+            "idx_game_sort_order", "idx_game_play_count",
             "idx_email", "idx_role", "idx_username",
+            "idx_user_email", "idx_user_role", "idx_user_active", "idx_user_username",
             "idx_gr_user_game", "idx_gr_game_score", "idx_gr_played_at", "idx_gr_user_recent",
             "idx_grv_game_created", "idx_grv_user_game",
+            "idx_game_review_game_created", "idx_game_review_user_game",
             "idx_user_active", "idx_expires",
-            "idx_name",
+            "idx_refresh_token_user_active", "idx_refresh_token_expires",
+            "idx_name", "idx_role_name",
             "uk_user_achievement",
+            "uk_achievement_unlock_user_achievement",
             "idx_user",
+            "idx_achievement_unlock_user",
         ]
         for idx in indexes:
             await conn.execute(text(f"DROP INDEX IF EXISTS {idx}"))

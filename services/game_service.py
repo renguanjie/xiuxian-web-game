@@ -45,7 +45,9 @@ class GameService:
 
     async def get_by_slug(self, slug: str) -> Optional[GameDetail]:
         """通过 slug 获取游戏详情"""
-        result = await self.db.execute(select(Game).where(Game.slug == slug))
+        result = await self.db.execute(
+            select(Game).where(Game.slug == slug, Game.status == "active")
+        )
         game = result.scalar_one_or_none()
         if not game:
             return None

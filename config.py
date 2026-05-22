@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = "postgres"
     DB_NAME: str = "xiuxian_games"
     DATABASE_URL: Optional[str] = None
+    DB_SSL: bool = False
 
     @property
     def async_database_url(self) -> str:
@@ -35,6 +36,9 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:5103", "http://localhost:3000"]
+
+    # 反向代理。只有来自这些代理的 X-Forwarded-For / X-Real-IP 才会被信任
+    TRUSTED_PROXY_IPS: List[str] = ["127.0.0.1", "::1"]
 
     model_config = {
         "env_file": str(Path(__file__).resolve().parent / ".env"),

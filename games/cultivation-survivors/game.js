@@ -723,11 +723,6 @@ class Projectile {
   }
 
   update(dt) {
-    // DEBUG: log sword state on creation
-    if (this.type === 'sword' && this.life > 1.9 && !this._debugLogged) {
-      this._debugLogged = true;
-      console.log(`[飞剑-投射物] 已创建: pos=(${this.x.toFixed(0)},${this.y.toFixed(0)}) vel=(${this.vx.toFixed(0)},${this.vy.toFixed(0)}) color=${this.color} size=${this.size}`);
-    }
     // Homing: adjust velocity toward target each frame
     if (this.target && this.target.alive) {
       const dx = this.target.x - this.x;
@@ -1160,8 +1155,6 @@ class Player {
       this.defenseReduction = Math.max(0.5, this.defenseReduction - 0.03); // -3% 受伤, 最低 50%
       this.skillDamageBonus += 0.05; // +5% 技能伤害
 
-      console.log(`[升级] Lv.${this.level} 属性提升 → HP: ${this.maxHp} | 攻击力: +${(this.attackBonus * 100).toFixed(0)}% | 防御力: -${((1 - this.defenseReduction) * 100).toFixed(1)}% 减伤 | 技能伤害: +${(this.skillDamageBonus * 100).toFixed(0)}%`);
-
       if (this.level % CONFIG.LEVELS_PER_REALM === 1 && this.level > 1) {
         this.realmIndex = Math.min(Math.floor(this.level / CONFIG.LEVELS_PER_REALM), REALMS.length - 1);
         return { leveled: true, breakthrough: true };
@@ -1477,9 +1470,8 @@ class Game {
     this.targetCamX = this.camX;
     this.targetCamY = this.camY;
 
-    // ✅ 默认赋予飞剑技能，游戏开始即可自动发射
+    // 默认赋予飞剑技能，游戏开始即可自动发射
     this.player.skills.flying_sword = 1;
-    console.log('[飞剑] 游戏开始，自动习得飞剑技能 Lv.1');
 
     if (!this._loopStarted) {
       this._loopStarted = true;
@@ -1645,7 +1637,6 @@ class Game {
             this.audio.play('hit');
             this.damageNumbers.push(new DamageNumber(e.x, e.y - e.size, p.damage, '#ff0'));
             this.particles.emit(e.x, e.y, 3, p.color, { speed: 60, life: 0.2, size: 2 });
-            console.log(`[飞剑] ✅ 命中敌人! 伤害=${p.damage.toFixed(1)} 敌人HP=${e.hp.toFixed(0)}`);
             if (!e.alive) this.onEnemyKill(e);
           }
           p.alive = false;
@@ -1817,10 +1808,6 @@ class Game {
       }
     }
     this.groundEquipment.length = geWrite;
-    if (deadProj > 0) {
-      console.log(`[飞剑] 清理 ${deadProj} 个消失/过期的投射物 | 剩余=${this.projectiles.length}`);
-    }
-
     // Camera smoothing (was instant snap → jittery)
     this.targetCamX = this.player.x - this.canvas.width / 2;
     this.targetCamY = this.player.y - this.canvas.height / 2;
@@ -1893,9 +1880,6 @@ class Game {
             this.projectiles.push(proj);
           }
           this.audio.play('sword');
-          console.log(`[飞剑] 发射 ${eff.count} 把 | 目标距离=${dist.toFixed(0)} | 伤害=${(eff.damage + p.damage * 0.5).toFixed(1)} | 投射物总数=${this.projectiles.length}`);
-        } else {
-          console.log(`[飞剑] 冷却结束但范围内(${eff.range})无敌人`);
         }
       }
     }
@@ -2578,7 +2562,6 @@ class Game {
       }
     }
 
-    console.log(`[大招] 天劫降临! ${instantKill ? '⚡ 即刻死亡 (5%)' : '💥 80%最大HP伤害 (95%)'} | 敌人数量: ${aliveEnemies.length}`);
   }
 
   gameOver() {

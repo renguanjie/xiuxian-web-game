@@ -18,4 +18,4 @@ class Role(Base):
 
     users = relationship("User", back_populates="role")
 
-    __table_args__ = (Index("idx_name", "name"),)
+    __table_args__ = (Index("idx_role_name", "name"),)

@@ -27,8 +27,8 @@ class User(Base):
     stats = relationship("UserStats", back_populates="user", uselist=False, lazy="selectin")
 
     __table_args__ = (
-        Index("idx_email", "email"),
-        Index("idx_role", "role_id"),
-        Index("idx_active", "is_active"),
-        Index("idx_username", "username"),
+        Index("idx_user_email", "email"),
+        Index("idx_user_role", "role_id"),
+        Index("idx_user_active", "is_active"),
+        Index("idx_user_username", "username"),
     )

@@ -1,19 +1,26 @@
 """排行榜业务逻辑"""
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+
 from fastapi import HTTPException
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.game import Game
-from schemas.record import LeaderboardOut, LeaderboardEntry
+from models.record import GameRecord
+from models.user import User
+from schemas.record import LeaderboardEntry
 
 
-# 周期对应的 SQL 时间过滤
-PERIOD_FILTERS = {
-    "day": "AND gr.played_at >= NOW() - INTERVAL 1 DAY",
-    "week": "AND gr.played_at >= NOW() - INTERVAL 7 DAY",
-    "month": "AND gr.played_at >= NOW() - INTERVAL 30 DAY",
-    "all": "",
+# 周期对应的时间窗口，避免使用数据库方言敏感的 INTERVAL 语法
+PERIOD_DELTAS = {
+    "day": timedelta(days=1),
+    "week": timedelta(days=7),
+    "month": timedelta(days=30),
+    "all": None,
 }
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class LeaderboardService:
@@ -28,41 +35,55 @@ class LeaderboardService:
         if not game:
             raise HTTPException(status_code=404, detail="游戏不存在")
 
-        period_sql = PERIOD_FILTERS.get(period, PERIOD_FILTERS["all"])
+        period_delta = PERIOD_DELTAS.get(period, PERIOD_DELTAS["all"])
+        conditions = [
+            GameRecord.game_id == game_id,
+            User.is_active == 1,
+        ]
+        if period_delta is not None:
+            conditions.append(GameRecord.played_at >= _utcnow() - period_delta)
 
-        query = text(f"""
-            SELECT
-                u.id AS user_id,
-                u.username,
-                u.avatar,
-                MAX(gr.score) AS best_score,
-                COUNT(gr.id) AS play_count,
-                MAX(gr.played_at) AS last_played,
-                RANK() OVER (ORDER BY MAX(gr.score) DESC) AS `rank`
-            FROM game_records gr
-            JOIN users u ON gr.user_id = u.id
-            WHERE gr.game_id = :game_id AND u.is_active = 1
-            {period_sql}
-            GROUP BY u.id, u.username, u.avatar
-            ORDER BY best_score DESC
-            LIMIT :limit OFFSET :offset
-        """)
-
-        result = await self.db.execute(
-            query,
-            {"game_id": game_id, "limit": per_page, "offset": (page - 1) * per_page},
+        best_scores = (
+            select(
+                User.id.label("user_id"),
+                User.username,
+                User.avatar,
+                func.max(GameRecord.score).label("best_score"),
+                func.count(GameRecord.id).label("play_count"),
+                func.max(GameRecord.played_at).label("last_played"),
+            )
+            .join(User, GameRecord.user_id == User.id)
+            .where(*conditions)
+            .group_by(User.id, User.username, User.avatar)
+            .subquery()
         )
+
+        ranked_scores = (
+            select(
+                best_scores.c.user_id,
+                best_scores.c.username,
+                best_scores.c.avatar,
+                best_scores.c.best_score,
+                best_scores.c.play_count,
+                best_scores.c.last_played,
+                func.rank().over(order_by=best_scores.c.best_score.desc()).label("rank"),
+            )
+            .subquery()
+        )
+
+        query = (
+            select(ranked_scores)
+            .order_by(ranked_scores.c.best_score.desc(), ranked_scores.c.user_id.asc())
+            .limit(per_page)
+            .offset((page - 1) * per_page)
+        )
+
+        result = await self.db.execute(query)
         rows = result.mappings().all()
 
         # 获取总用户数 (用于分页)
-        count_query = text(f"""
-            SELECT COUNT(DISTINCT u.id) AS total
-            FROM game_records gr
-            JOIN users u ON gr.user_id = u.id
-            WHERE gr.game_id = :game_id AND u.is_active = 1
-            {period_sql}
-        """)
-        count_result = await self.db.execute(count_query, {"game_id": game_id})
+        count_query = select(func.count()).select_from(best_scores)
+        count_result = await self.db.execute(count_query)
         total = count_result.scalar() or 0
 
         entries = [

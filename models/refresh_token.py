@@ -21,6 +21,6 @@ class RefreshToken(Base):
     user = relationship("User", lazy="selectin")
 
     __table_args__ = (
-        Index("idx_user_active", "user_id", "is_revoked"),
-        Index("idx_expires", "expires_at"),
+        Index("idx_refresh_token_user_active", "user_id", "is_revoked"),
+        Index("idx_refresh_token_expires", "expires_at"),
     )

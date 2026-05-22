@@ -1,5 +1,5 @@
 """通用 API 响应与分页模型"""
-from typing import Generic, TypeVar, Optional, Any
+from typing import Generic, TypeVar, Optional
 from pydantic import BaseModel
 
 

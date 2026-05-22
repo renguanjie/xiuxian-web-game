@@ -9,13 +9,17 @@ from models.record import GameRecord, UserStats
 from schemas.record import RecordSubmitResponse
 
 
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 class RecordService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def submit(
         self, user: User, game_id: int, score: int, duration: int,
-        metadata: dict, ip_address: str, user_agent: str,
+        metadata: dict, ip_address: str, user_agent: str | None,
     ) -> RecordSubmitResponse:
         """提交游戏记录并更新统计"""
         # 验证游戏存在
@@ -60,7 +64,7 @@ class RecordService:
         stats = await self._get_or_create_stats(user.id)
         stats.total_games += 1
         stats.total_duration += duration
-        stats.last_played = datetime.utcnow()
+        stats.last_played = _utcnow()
         if score > stats.best_score:
             stats.best_score = score
 

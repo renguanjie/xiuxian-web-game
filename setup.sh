@@ -8,38 +8,26 @@ cd "$PROJECT_DIR"
 
 echo "=== 修仙游戏平台 - 环境初始化 ==="
 
-# 1. 初始化数据库
+# 1. 安装后端依赖
 echo ""
-echo "[1/4] 初始化数据库..."
-if [ -f "init.sql" ]; then
-    if grep -q "neon.tech" .env 2>/dev/null; then
-        echo "检测到 Neon PostgreSQL 配置，跳过本地建库 (Neon 自动建库)"
-    else
-        PGPASSWORD="${DB_PASSWORD:-xiuxian}" psql -h "${DB_HOST:-localhost}" -p "${DB_PORT:-5432}" -U "${DB_USER:-postgres}" -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME:-xiuxian_games}'" | grep -q 1 || \
-        PGPASSWORD="${DB_PASSWORD:-xiuxian}" createdb -h "${DB_HOST:-localhost}" -p "${DB_PORT:-5432}" -U "${DB_USER:-postgres}" "${DB_NAME:-xiuxian_games}" 2>/dev/null || {
-            echo "PostgreSQL 未运行或连接失败"
-            echo "请确保 PostgreSQL 已启动，或检查 .env 中 DATABASE_URL"
-            exit 1
-        }
-    fi
-fi
-
-# 2. 执行建表脚本
-echo "[2/4] 执行建表脚本..."
-if [ -f "init.sql" ]; then
-    python rebuild_db.py
-fi
-echo "数据库初始化完成"
-
-# 3. 安装后端依赖
-echo ""
-echo "[3/4] 安装后端依赖..."
+echo "[1/4] 安装后端依赖..."
 if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 source venv/bin/activate
 pip install -r requirements.txt --quiet
 echo "后端依赖安装完成"
+
+# 2. 初始化数据库
+echo "[2/4] 执行建表脚本..."
+python rebuild_db.py
+echo "数据库初始化完成"
+
+# 3. 初始化种子数据
+echo ""
+echo "[3/4] 初始化种子数据..."
+python seed.py
+echo "种子数据初始化完成"
 
 # 4. 安装前端依赖
 echo ""
