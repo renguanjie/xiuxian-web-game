@@ -1,9 +1,15 @@
 """配置管理 - 使用 pydantic-settings 加载环境变量"""
 from pathlib import Path
+import secrets
+import warnings
+
 from pydantic_settings import BaseSettings
 from pydantic import model_validator
 from typing import List, Optional
 from functools import lru_cache
+
+
+DEFAULT_SECRET_KEY = "change-me-to-a-long-random-string"
 
 
 class Settings(BaseSettings):
@@ -12,7 +18,7 @@ class Settings(BaseSettings):
     # 应用
     APP_NAME: str = "修仙游戏平台"
     DEBUG: bool = False
-    SECRET_KEY: str = "change-me-to-a-long-random-string"
+    SECRET_KEY: str = DEFAULT_SECRET_KEY
 
     # 数据库
     DB_HOST: str = "localhost"
@@ -47,9 +53,19 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_secret_key(self) -> "Settings":
-        if not self.DEBUG and self.SECRET_KEY == "change-me-to-a-long-random-string":
+        if self.SECRET_KEY == DEFAULT_SECRET_KEY:
+            self.SECRET_KEY = secrets.token_urlsafe(32)
+            if not self.DEBUG:
+                warnings.warn(
+                    "SECRET_KEY 未设置，已生成临时运行时密钥。"
+                    "生产环境请在部署平台环境变量中设置稳定的 SECRET_KEY，"
+                    "否则服务重启后旧 JWT 会失效。",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+        elif len(self.SECRET_KEY) < 32:
             raise ValueError(
-                "SECRET_KEY 必须设置为一个安全的随机字符串。"
+                "SECRET_KEY 长度不能少于 32 个字符。"
                 "请使用 python -c 'import secrets; print(secrets.token_urlsafe(32))' 生成。"
             )
         return self
