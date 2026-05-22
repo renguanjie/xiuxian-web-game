@@ -45,7 +45,8 @@ def _rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRespons
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
-    await init_db()
+    if settings.INIT_DB_ON_STARTUP:
+        await init_db()
     yield
     await engine.dispose()
 

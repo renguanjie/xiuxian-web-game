@@ -11,6 +11,7 @@ services:
       DEBUG: "false"
       CORS_ORIGINS: '["http://localhost"]'
       DB_SSL: "${DB_SSL:-true}"
+      INIT_DB_ON_STARTUP: "${INIT_DB_ON_STARTUP:-true}"
       TRUSTED_PROXY_IPS: '${TRUSTED_PROXY_IPS:-["172.16.0.0/12","127.0.0.1","::1"]}'
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-15}
       REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-30}

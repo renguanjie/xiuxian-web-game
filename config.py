@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     DB_NAME: str = "xiuxian_games"
     DATABASE_URL: Optional[str] = None
     DB_SSL: bool = False
+    INIT_DB_ON_STARTUP: bool = False
 
     @property
     def async_database_url(self) -> str:

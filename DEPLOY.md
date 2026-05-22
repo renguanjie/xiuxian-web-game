@@ -94,11 +94,25 @@ docker compose exec backend python seed.py
 |------|------|--------|
 | `DATABASE_URL` | PostgreSQL 连接字符串 | **必须配置** |
 | `DB_SSL` | 是否为 asyncpg 连接启用 SSL | 生产建议 `true` |
+| `INIT_DB_ON_STARTUP` | 应用启动时是否自动创建表 | Vercel 建议 `false` |
 | `SECRET_KEY` | JWT 签名密钥 | **必须修改** |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | 访问令牌过期时间 | `15` |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | 刷新令牌过期时间 | `30` |
 | `TRUSTED_PROXY_IPS` | 可信反向代理 IP/CIDR 列表 | Docker 默认信任 bridge 网段 |
 | `DEBUG` | 调试模式 | `false` |
+
+### Vercel 环境变量
+
+Vercel 不会读取本地 `.env` 文件。请在 Vercel Project Settings → Environment Variables 中至少配置：
+
+```bash
+SECRET_KEY=<python -c "import secrets; print(secrets.token_urlsafe(32))" 生成的值>
+DATABASE_URL=postgresql+asyncpg://<user>:<password>@<host>/<dbname>?sslmode=require
+DB_SSL=true
+INIT_DB_ON_STARTUP=false
+```
+
+如果日志里的 `config.py` 行号仍显示 `settings = get_settings()` 在 59 行附近，说明 Vercel 部署的不是当前 `origin/main`。请在 Vercel Deployments 中选择最新提交重新部署，或执行一次清缓存重新部署。
 
 ## 数据库
 

@@ -98,6 +98,7 @@ PythonWebGameProject/
 |------|------|--------|
 | `DATABASE_URL` | PostgreSQL 连接字符串 | `postgresql+asyncpg://...` |
 | `DB_SSL` | 是否为 asyncpg 连接启用 SSL | `false` |
+| `INIT_DB_ON_STARTUP` | 应用启动时是否自动创建表 | `false` |
 | `SECRET_KEY` | JWT 签名密钥 | 开发环境默认值 |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | 访问令牌过期时间 | `15` |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | 刷新令牌过期时间 | `30` |
