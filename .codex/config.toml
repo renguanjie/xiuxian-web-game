@@ -1,0 +1,7 @@
+[mcp_servers.gitnexus]
+args = [
+    "-y",
+    "gitnexus@latest",
+    "mcp",
+]
+command = "npx"
