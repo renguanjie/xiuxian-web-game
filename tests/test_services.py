@@ -91,6 +91,14 @@ class ServiceQueryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(args, {"ssl": "require"})
         self.assertNotIn("sslmode", str(url))
 
+    def test_database_converts_standard_postgres_url_to_asyncpg(self):
+        url, _ = build_connect_config(
+            "postgresql://user:pass@example.com/db?sslmode=require",
+            db_ssl=False,
+        )
+
+        self.assertEqual(url.drivername, "postgresql+asyncpg")
+
     def test_rate_limit_ignores_spoofed_forwarded_for_from_untrusted_client(self):
         request = SimpleNamespace(
             headers={"X-Forwarded-For": "1.2.3.4"},

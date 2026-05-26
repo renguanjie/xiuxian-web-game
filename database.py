@@ -9,6 +9,8 @@ from config import settings
 def build_connect_config(raw_url: str, db_ssl: bool):
     """把通用 PostgreSQL URL 转换成 asyncpg 可接受的 URL 和连接参数"""
     url = make_url(raw_url)
+    if url.drivername in {"postgres", "postgresql"}:
+        url = url.set(drivername="postgresql+asyncpg")
     query = dict(url.query)
     sslmode = query.pop("sslmode", None)
     ssl = query.pop("ssl", None)

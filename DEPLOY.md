@@ -107,10 +107,12 @@ Vercel 不会读取本地 `.env` 文件。请在 Vercel Project Settings → Env
 
 ```bash
 SECRET_KEY=<python -c "import secrets; print(secrets.token_urlsafe(32))" 生成的值>
-DATABASE_URL=postgresql+asyncpg://<user>:<password>@<host>/<dbname>?sslmode=require
+DATABASE_URL=<Vercel Storage / Neon 自动注入或提供的连接字符串>
 DB_SSL=true
 INIT_DB_ON_STARTUP=false
 ```
+
+可在项目侧边栏的 `Storage` 中创建或连接 Neon Postgres，并将注入的变量应用到 `Production` 环境。程序兼容 Neon 提供的 `postgresql://...` 连接字符串。
 
 如果日志里的 `config.py` 行号仍显示 `settings = get_settings()` 在 59 行附近，说明 Vercel 部署的不是当前 `origin/main`。请在 Vercel Deployments 中选择最新提交重新部署，或执行一次清缓存重新部署。
 
