@@ -51,7 +51,6 @@ PythonWebGameProject/
 │   ├── src/data/games.ts   # 首页与详情页使用的静态游戏目录
 │   ├── src/views/          # 游戏大厅与游戏播放页
 │   └── tests/              # 静态发布回归测试
-├── docs/superpowers/       # 设计与实施记录
 └── vercel.json             # Vercel 静态构建及 SPA 路由
 ```
 

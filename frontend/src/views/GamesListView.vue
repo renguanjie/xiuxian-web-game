@@ -30,28 +30,23 @@
     </div>
 
     <GameGrid>
-      <GameCard v-for="game in gamesStore.games" :key="game.id" :game="game" />
+      <GameCard v-for="game in games" :key="game.id" :game="game" />
     </GameGrid>
 
-    <div v-if="gamesStore.games.length === 0" class="text-center py-16 text-text-muted">
+    <div v-if="games.length === 0" class="text-center py-16 text-text-muted">
       当前分类暂无游戏
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useGamesStore } from '@/stores/games'
+import { computed, ref } from 'vue'
+import { listGames } from '@/data/games'
 import { CATEGORY_LABELS } from '@/types'
 import GameCard from '@/components/game/GameCard.vue'
 import GameGrid from '@/components/game/GameGrid.vue'
 
-const gamesStore = useGamesStore()
 const selectedCategory = ref('')
-
 const categories = Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ label: label, value }))
-
-watch(selectedCategory, (cat) => {
-  gamesStore.filterGames(cat || undefined)
-})
+const games = computed(() => listGames(selectedCategory.value || undefined))
 </script>

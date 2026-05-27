@@ -64,3 +64,13 @@ test('the static shell does not ship a full component library for simple buttons
     assert.equal(content.includes('<el-button'), false, source)
   }
 })
+
+test('the static catalog does not keep unused platform scaffolding', () => {
+  const packageJson = JSON.parse(readFileSync(join(frontendRoot, 'package.json'), 'utf8'))
+  assert.equal(packageJson.dependencies.pinia, undefined)
+  assert.equal(packageJson.devDependencies.puppeteer, undefined)
+  assert.equal(existsSync(join(frontendRoot, 'src/stores')), false)
+  assert.equal(existsSync(join(frontendRoot, 'Dockerfile')), false)
+  assert.equal(existsSync(join(projectRoot, '.dockerignore')), false)
+  assert.equal(existsSync(join(projectRoot, 'docs/superpowers')), false)
+})
