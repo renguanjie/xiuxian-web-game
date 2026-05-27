@@ -75,5 +75,7 @@ iframe player's loading failure state.
 ## Out Of Scope
 
 User accounts, favorites synced across devices, reviews, leaderboards,
-score persistence, administration, and database migrations are intentionally
-removed rather than simulated locally.
+platform-level score persistence, administration, and database migrations are
+intentionally removed rather than simulated locally. Browser-only score or
+best-record behavior already implemented inside an individual game remains
+part of that game and does not require a backend.
