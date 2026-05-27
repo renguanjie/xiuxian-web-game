@@ -11,22 +11,11 @@ export default defineConfig({
   },
   server: {
     port: 5103,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/static/games': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-    },
   },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          'element-plus': ['element-plus'],
           'vue-vendor': ['vue', 'vue-router', 'pinia'],
         },
       },

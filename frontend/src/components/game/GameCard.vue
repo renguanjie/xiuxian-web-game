@@ -21,10 +21,11 @@
     <!-- 信息 -->
     <div class="p-3">
       <h3 class="text-base font-semibold text-text-primary truncate">{{ game.name }}</h3>
-      <p class="text-xs text-text-secondary mt-1 truncate">{{ game.description || '' }}</p>
-      <div class="flex items-center gap-3 mt-2 text-xs text-text-muted">
-        <span>👁 {{ formatCount(game.play_count) }} 次游玩</span>
-        <span>⭐ {{ game.avg_score.toFixed(0) }}</span>
+      <p class="text-xs text-text-secondary mt-1 truncate">{{ game.description }}</p>
+      <div class="flex items-center gap-2 mt-2 text-xs text-text-muted">
+        <span v-for="tag in game.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-bg-tertiary rounded">
+          {{ tag }}
+        </span>
       </div>
     </div>
   </RouterLink>
@@ -37,12 +38,6 @@ import { CATEGORY_LABELS } from '@/types'
 const props = defineProps<{ game: Game }>()
 
 const categoryLabel = CATEGORY_LABELS[props.game.category] || props.game.category
-
-function formatCount(n: number): string {
-  if (n >= 10000) return `${(n / 10000).toFixed(1)}万`
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
-  return String(n)
-}
 </script>
 
 <style scoped>

@@ -6,14 +6,9 @@
       <a class="text-text-secondary hover:text-text-primary transition-colors cursor-pointer text-sm sm:text-base" @click="goBack">
         ← 返回大厅
       </a>
-      <div class="flex items-center gap-2">
-        <RouterLink :to="`/leaderboard/${gameId}`" class="text-text-secondary hover:text-text-primary text-xs sm:text-sm">
-          🏆 排行榜
-        </RouterLink>
-        <el-button size="small" @click="toggleFullscreen">
-          {{ isFullscreen ? '退出全屏' : '全屏' }}
-        </el-button>
-      </div>
+      <button type="button" class="px-3 py-1.5 text-sm rounded-game bg-bg-secondary text-text-secondary hover:text-text-primary transition-colors" @click="toggleFullscreen">
+        {{ isFullscreen ? '退出全屏' : '全屏' }}
+      </button>
     </div>
 
     <!-- 竖屏旋转提示 -->
@@ -47,7 +42,9 @@
       <div v-if="error" class="absolute inset-0 flex items-center justify-center bg-bg-secondary/80">
         <div class="text-center">
           <div class="text-red-400 mb-2">游戏加载失败</div>
-          <el-button size="small" @click="retry">重试</el-button>
+          <button type="button" class="px-3 py-1.5 text-sm rounded-game bg-primary-500 text-white" @click="retry">
+            重试
+          </button>
         </div>
       </div>
     </div>
@@ -62,7 +59,6 @@ import { useFullscreen } from '@vueuse/core'
 const router = useRouter()
 const props = defineProps<{
   path: string
-  gameId: number
 }>()
 
 const playerContainer = ref<HTMLElement | null>(null)
@@ -73,7 +69,7 @@ const isPortrait = ref(false)
 const hintDismissed = ref(false)
 
 const gameUrl = computed(() => {
-  return `/static/games/${props.path}`
+  return `/games/${props.path}`
 })
 
 function updateOrientation() {

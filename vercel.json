@@ -7,27 +7,19 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "main.py",
-      "use": "@vercel/python"
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "main.py"
-    },
-    {
-      "src": "/static/games/(.*)",
-      "dest": "main.py"
-    },
     {
       "handle": "filesystem"
     },
     {
       "src": "/assets/(.*)",
       "dest": "/frontend/assets/$1"
+    },
+    {
+      "src": "/games/(.*)",
+      "dest": "/frontend/games/$1"
     },
     {
       "src": "/favicon.svg",

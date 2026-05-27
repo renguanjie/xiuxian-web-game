@@ -53,3 +53,14 @@ test('frontend source does not retain platform backend modules', () => {
     assert.equal(existsSync(join(frontendRoot, removedPath)), false, removedPath)
   }
 })
+
+test('the static shell does not ship a full component library for simple buttons', () => {
+  const packageJson = JSON.parse(readFileSync(join(frontendRoot, 'package.json'), 'utf8'))
+  assert.equal(packageJson.dependencies['element-plus'], undefined)
+
+  for (const source of ['src/main.ts', 'src/views/GamesListView.vue', 'src/components/game/GamePlayer.vue']) {
+    const content = readFileSync(join(frontendRoot, source), 'utf8')
+    assert.equal(content.includes('element-plus'), false, source)
+    assert.equal(content.includes('<el-button'), false, source)
+  }
+})
